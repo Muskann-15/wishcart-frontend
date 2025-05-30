@@ -1,8 +1,10 @@
-@import '../../assets/styles/variables';
+// @import '../../assets/styles/variables';
 
 .container {
   padding: 2rem;
-  background-color: $background-gray;
+  background-color: #f9f9f9;
+  position: relative;
+  min-height: calc(100vh - 64px); // Adjust based on your header height
 }
 
 .content {
@@ -24,5 +26,20 @@
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.viewCartButton {
+  position: fixed !important;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 2rem !important;
+  font-size: 1.1rem !important;
+  border-radius: 30px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: transform 0.2s ease !important;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 

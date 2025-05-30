@@ -35,7 +35,7 @@
 .searchButton {
   background-color: #3182ce !important;
   color: #fff;
-  text-transform: none;
+  text-transform: capitalize !important;
   padding: 0.5rem 1.2rem;
   &:hover {
     background-color: #2b6cb0;

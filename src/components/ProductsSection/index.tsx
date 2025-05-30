@@ -1,23 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Card, CardContent, CardMedia, Button } from '@mui/material';
 import styles from './productsSection.module.scss';
-import { CategoryPageProducts } from '../../constants/constants';
+import product_sneakers from '../../assets/images/products/product_sneakers.png';
+import product_backpack from '../../assets/images/products/product_backpack.png';
+import product_watch from '../../assets/images/products/product_watch.png';
 
-const ProductSection: React.FC = () => {
-  const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
+interface ProductSectionProps {
+  onQuantityChange: (productId: number, quantity: number) => void;
+  quantities: { [key: number]: number };
+}
 
+const products = [
+  {
+    id: 1,
+    title: 'Stylish Sneakers',
+    image: product_sneakers,
+    price: '₹999',
+  },
+  {
+    id: 2,
+    title: 'Trendy Backpack',
+    image: product_backpack,
+    price: '₹799',
+  },
+  {
+    id: 3,
+    title: 'Smart Watch',
+    image: product_watch,
+    price: '₹1999',
+  },
+];
+
+const ProductSection: React.FC<ProductSectionProps> = ({ onQuantityChange, quantities }) => {
   const handleIncrement = (id: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
+    onQuantityChange(id, (quantities[id] || 0) + 1);
   };
 
   const handleDecrement = (id: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [id]: Math.max((prev[id] || 0) - 1, 0),
-    }));
+    if (quantities[id] > 0) {
+      onQuantityChange(id, quantities[id] - 1);
+    }
   };
 
   return (
@@ -26,7 +48,7 @@ const ProductSection: React.FC = () => {
         Shop Now !!
       </Typography>
       <Box className={styles.grid}>
-        {CategoryPageProducts.map(product => (
+        {products.map(product => (
           <Card key={product.id} className={styles.card}>
             <CardMedia
               component="img"
@@ -37,14 +59,22 @@ const ProductSection: React.FC = () => {
             <CardContent>
               <Typography className={styles.name}>{product.title}</Typography>
               <Typography className={styles.price}>{product.price}</Typography>
+
               <Box className={styles.quantityControl}>
-                <Button onClick={() => handleDecrement(product.id)} className={styles.qtyBtn}>
+                <Button 
+                  onClick={() => handleDecrement(product.id)} 
+                  className={styles.qtyBtn}
+                  disabled={!quantities[product.id]}
+                >
                   -
                 </Button>
                 <Typography className={styles.quantity}>
                   {quantities[product.id] || 0}
                 </Typography>
-                <Button onClick={() => handleIncrement(product.id)} className={styles.qtyBtn}>
+                <Button 
+                  onClick={() => handleIncrement(product.id)} 
+                  className={styles.qtyBtn}
+                >
                   +
                 </Button>
               </Box>

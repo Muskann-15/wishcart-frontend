@@ -1,0 +1,33 @@
+.cartPage {
+    padding: 2rem;
+    max-width: 600px;
+    margin: auto;
+    min-height: calc(100vh - 140px); /* Adjust this value based on your header/footer height */
+    display: flex;
+    flex-direction: column;
+    border: ridge;
+  }
+  
+  .heading {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  
+  .cartItems {
+    margin-bottom: 2rem;
+    flex: 1;
+  }
+  
+  .cartItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+  }
+  
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
