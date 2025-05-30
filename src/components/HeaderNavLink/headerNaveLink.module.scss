@@ -3,8 +3,13 @@
   justify-items: center;
   justify-content: space-around;
   padding: 1.5rem 2rem;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #ddd;
+  background-color: #252525;
+  
+  p{
+    color:#fff;
+    font-size: 18px;
+    font-weight: 600;
+  }
 }
 
 .categoryItem {

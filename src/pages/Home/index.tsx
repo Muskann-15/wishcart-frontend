@@ -22,6 +22,7 @@ const HomePage: React.FC = () => {
   return (
     <Box component="main" className={styles.main}>
       <HeaderNavLink />
+      <Box className={styles.container}>
       <Slider {...CarouselSettings}>
         {CarouselImages.map((item, index) => (
           <Box key={index} className={styles.slide}>
@@ -32,6 +33,7 @@ const HomePage: React.FC = () => {
       {CategorySectionProducts.map((section, index) => (
         <CategorySection key={index} title={section.title} products={section.products} />
       ))}
+      </Box>
     </Box>
   );
 };

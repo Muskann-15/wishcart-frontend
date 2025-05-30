@@ -5,9 +5,14 @@
     min-height: calc(100vh - 140px); /* Adjust this value based on your header/footer height */
     display: flex;
     flex-direction: column;
-    border: ridge;
+    // border: ridge;
+    background-color: #fff;
+    border-radius: 8px;
   }
-  
+  .yourcartdiv{
+    background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(139, 69, 19, 1));
+    padding: 40px;
+  }
   .heading {
     font-weight: bold;
     margin-bottom: 1rem;

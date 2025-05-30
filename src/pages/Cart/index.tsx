@@ -15,6 +15,7 @@ const CartPage: React.FC = () => {
   };
 
   return (
+    <Box className={styles.yourcartdiv}>
     <Box className={styles.cartPage}>
       <Typography variant="h4" className={styles.heading}>
         Your Cart
@@ -36,6 +37,7 @@ const CartPage: React.FC = () => {
           Buy Now
         </Button>
       </Box>
+    </Box>
     </Box>
   );
 };
