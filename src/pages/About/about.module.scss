@@ -1,0 +1,27 @@
+.aboutPage {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
+  min-height: calc(100vh - 140px);
+  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(139, 69, 19, 1));
+}
+
+.heading {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+.content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.text {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #333;
+} 

@@ -1,0 +1,59 @@
+.filterContainer {
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 280px;
+}
+
+.filterTitle {
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.filterAccordion {
+  margin-bottom: 0.5rem !important;
+  box-shadow: none !important;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px !important;
+
+  &:before {
+    display: none;
+  }
+
+  .MuiAccordionSummary-root {
+    padding: 0 1rem;
+    min-height: 48px;
+  }
+
+  .MuiAccordionDetails-root {
+    padding: 0.5rem 1rem 1rem;
+  }
+}
+
+.filterCheckbox {
+  margin: 0.5rem 0;
+  width: 100%;
+
+  .MuiFormControlLabel-label {
+    font-size: 0.9rem;
+    color: #666;
+  }
+}
+
+.priceSlider {
+  padding: 0.5rem 0.5rem 0;
+
+  .MuiSlider-root {
+    color: #1976d2;
+  }
+}
+
+.priceInputs {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.9rem;
+}

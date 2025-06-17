@@ -1,45 +1,132 @@
-// @import '../../assets/styles/variables';
-
 .container {
-  padding: 2rem;
-  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(139, 69, 19, 1));;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5f5;
+  max-width: 100% !important;
+}
+
+.breadcrumbs {
+  margin-top: 5%;
+  padding: 0.5rem 0;
+}
+
+.title {
+  margin-bottom: 2rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.loadingText {
+  text-align: center;
+  margin: 2rem 0;
+  color: #666;
+}
+
+.errorText {
+  text-align: center;
+  margin: 2rem 0;
+  color: #d32f2f;
+}
+
+.noProducts {
+  text-align: center;
+  margin: 2rem 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.productCard {
   position: relative;
-  min-height: calc(100vh - 64px); // Adjust based on your header height
 }
 
-.content {
+.con-like {
+  --red: #ff4d4d;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.con-like .like {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 20;
+  cursor: pointer;
+}
+
+.con-like .checkmark {
+  width: 100%;
+  height: 100%;
   display: flex;
-  gap: 2rem;
+  justify-content: center;
+  align-items: center;
 }
 
-.filterSection {
-  flex: 0 0 250px;
-  background-color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.con-like .outline,
+.con-like .filled {
+  fill: var(--red);
+  position: absolute;
 }
 
-.productSection {
-  flex: 1;
-  background-color: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.con-like .filled {
+  animation: kfr-filled 0.5s;
+  display: none;
 }
 
-.viewCartButton {
-  position: fixed !important;
-  bottom: 2rem;
-  right: 2rem;
-  padding: 1rem 2rem !important;
-  font-size: 1.1rem !important;
-  border-radius: 30px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transition: transform 0.2s ease !important;
+.con-like .celebrate {
+  position: absolute;
+  animation: kfr-celebrate 0.5s;
+  animation-fill-mode: forwards;
+  display: none;
+}
 
-  &:hover {
-    transform: translateY(-2px);
+.con-like .poly {
+  stroke: var(--red);
+  fill: var(--red);
+}
+
+.con-like .like:checked ~ .checkmark .filled {
+  display: block;
+}
+
+.con-like .like:checked ~ .checkmark .celebrate {
+  display: block;
+}
+
+@keyframes kfr-filled {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
+@keyframes kfr-celebrate {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+    display: none;
+  }
+} 

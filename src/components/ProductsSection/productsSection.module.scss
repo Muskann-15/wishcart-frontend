@@ -22,47 +22,192 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   background: #fff;
+  position: relative;
 
   &:hover {
     transform: translateY(-5px);
   }
 }
 
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.wishlistIcon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 25;
+}
+
+.quickBuyButton {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  text-align: center;
+  opacity: 0;
+
+  button {
+    width: 80%;
+    background-color: #fff;
+    color: #000;
+    font-weight: bold;
+    border-radius: 0;
+    text-transform: capitalize !important;
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
+}
+
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 5px 0;
+
+  button {
+    min-width: 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ff4d4d;
+    color: #fff;
+    font-weight: bold;
+    padding: 0;
+
+    &:hover {
+      background-color: #e03b3b;
+    }
+  }
+
+  p {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+}
+
 .image {
   height: 180px;
   object-fit: cover;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 
 .name {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: bold !important;
 }
 
 .price {
-  color: #007aff;
+  color: #FF4D4D;
   font-size: 1rem;
   margin-top: 0.5rem;
+  font-weight: bold !important;
 }
 
-.quantityControl {
+.con-like {
+  --red: rgb(255, 50, 50);
+  position: relative;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.con-like .like {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 20;
+  cursor: pointer;
+}
+
+.con-like .checkmark {
+  width: 100%;
+  height: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
-  margin-top: 0.5rem;
+  cursor: pointer;
 }
 
-.qtyBtn {
-  background-color: #000 !important;
-  color: #fff !important;
-  min-width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 18px;
+.con-like .outline,
+.con-like .filled {
+  fill: var(--red);
+  position: absolute;
 }
 
-.quantity {
-  margin: 0 1rem;
-  font-size: 1.2rem;
-  font-weight: 600;
+.con-like .outline {
+  fill: transparent;
+  stroke: var(--red);
+  stroke-width: 2px;
+}
+
+.con-like .filled {
+  animation: kfr-filled 0.5s;
+  display: none;
+}
+
+.con-like .celebrate {
+  position: absolute;
+  animation: kfr-celebrate 0.5s;
+  animation-fill-mode: forwards;
+  display: none;
+}
+
+.con-like .poly {
+  stroke: var(--red);
+  fill: var(--red);
+}
+
+.con-like .like:checked~.checkmark .filled {
+  display: block
+}
+
+.con-like .like:checked~.checkmark .celebrate {
+  display: block
+}
+
+@keyframes kfr-filled {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes kfr-celebrate {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+    display: none;
+  }
+}
+
+.card:hover .quickBuyButton {
+  opacity: 1;
 }

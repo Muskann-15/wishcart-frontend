@@ -1,0 +1,251 @@
+.exclusiveBuyingPage {
+  padding: 40px 20px;
+  padding-top: 80px;
+  background-color: #f8f8f8;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .sectionHeading {
+    text-align: center;
+    color: #e91e63;
+    margin-bottom: 30px;
+    font-size: 2.8rem;
+    font-weight: 700;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .productDetailCard {
+    flex-direction: row;
+    width: 100%;
+    max-width: 1200px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+
+    @media (max-width: 900px) {
+      flex-direction: column;
+    }
+
+    .productImage {
+      width: 100%;
+      height: 500px;
+      object-fit: contain;
+      background-color: #ffffff;
+      padding: 20px;
+      box-sizing: border-box;
+
+      @media (max-width: 900px) {
+        height: 300px;
+      }
+    }
+
+    .productContent {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .productName {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .productPrice {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #e91e63;
+        margin-bottom: 20px;
+      }
+
+      .productDescription {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 30px;
+      }
+
+      .actionButtons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+
+        .addToCartButton,
+        .buyNowButton {
+          padding: 12px 25px;
+          font-size: 1.05rem;
+          font-weight: 600;
+          border-radius: 8px;
+          text-transform: capitalize;
+        }
+
+        .addToCartButton {
+          background-color: #ff4d4d;
+          color: #fff;
+          font-weight: bold;
+          padding: 10px 20px;
+          border-radius: 5px;
+          transition: background-color 0.3s ease;
+          height: 55px;
+          min-height: 55px;
+
+          &:hover {
+            background-color: #e03b3b;
+          }
+        }
+
+        .buyNowButton {
+          color: #e91e63;
+          border-color: #e91e63;
+          &:hover {
+            background-color: rgba(233, 30, 99, 0.04);
+          }
+        }
+      }
+    }
+  }
+}
+
+.loadingContainer,
+.errorContainer,
+.noProductContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  text-align: center;
+
+  h6 {
+    margin-top: 20px;
+    color: #777;
+  }
+}
+
+.con-like {
+  --red: #ff4d4d;
+  position: relative;
+  width: 50px;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.con-like .like {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 20;
+  cursor: pointer;
+}
+
+.con-like .checkmark {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.con-like .outline,
+.con-like .filled {
+  fill: var(--red);
+  position: absolute;
+}
+
+.con-like .filled {
+  animation: kfr-filled 0.5s;
+  display: none;
+}
+
+.con-like .celebrate {
+  position: absolute;
+  animation: kfr-celebrate 0.5s;
+  animation-fill-mode: forwards;
+  display: none;
+}
+
+.con-like .poly {
+  stroke: var(--red);
+  fill: var(--red);
+}
+
+.con-like .like:checked ~ .checkmark .filled {
+  display: block;
+}
+
+.con-like .like:checked ~ .checkmark .celebrate {
+  display: block;
+}
+
+@keyframes kfr-filled {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes kfr-celebrate {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+    display: none;
+  }
+}
+
+.quantitySelector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 0;
+  height: 55px;
+  min-height: 55px;
+
+  button {
+    min-width: 35px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #ff4d4d;
+    color: #fff;
+    font-weight: bold;
+    padding: 0;
+
+    &:hover {
+      background-color: #e03b3b;
+    }
+  }
+
+  p {
+    color: #333;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin: 0;
+  }
+} 

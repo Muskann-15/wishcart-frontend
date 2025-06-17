@@ -1,0 +1,47 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.loginCard {
+  background-color: #fff;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 1.5rem !important;
+  color: #333;
+}
+
+.loginButton {
+  margin-top: 1.5rem !important;
+  padding: 0.8rem 0 !important;
+  font-size: 1rem !important;
+  background-color: #007bff !important;
+
+  &:hover {
+    background-color: #0056b3 !important;
+  }
+}
+
+.signupText {
+  margin-top: 1.5rem !important;
+  color: #666;
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+} 

@@ -1,0 +1,82 @@
+.baseButton {
+  padding: 0.8rem 2rem !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+  border-radius: 50px !important;
+  font-size: 18px !important;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.containedButton {
+  background-color: #ff4d4d !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #ff3333 !important;
+  }
+}
+
+.outlinedButton {
+  border-color: #ff4d4d !important;
+  color: #ff4d4d !important;
+
+  &:hover {
+    background-color: rgba(255, 77, 77, 0.1) !important;
+  }
+}
+
+.primaryColor {
+  background-color: #007bff !important;
+  /* Example primary color */
+  border-color: #007bff !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+  }
+}
+
+.secondaryColor {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #5a6268 !important;
+    border-color: #5a6268 !important;
+  }
+}
+
+.successColor {
+  background-color: #28a745 !important;
+  border-color: #28a745 !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #218838 !important;
+    border-color: #218838 !important;
+  }
+}
+
+.errorColor {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #c82333 !important;
+    border-color: #c82333 !important;
+  }
+}
+
+.blackColor {
+  background-color: #333 !important;
+  border-color: #333 !important;
+  color: white !important;
+
+  &:hover {
+    background-color: #555 !important;
+    border-color: #555 !important;
+  }
+}

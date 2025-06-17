@@ -1,60 +1,382 @@
-import React, { useState } from 'react';
-import { Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { Filters, ProductSection } from '../../components';
+import React, { useEffect, useState } from 'react';
+import { useLocation, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material';
+import type { Product } from '../../type/product';
+import ProductSection from '../../components/ProductsSection';
+import CategoryFilter from '../../components/CategoryFilter';
+import { AppLoader } from '../../components/Loader';
+import { getWishlist } from '../../services/wishlistService';
+import { useCart } from '../../context/CartContext';
+import { API_BASE_URL } from '../../constants/api';
+import type { FetchedProductItem } from '../../types/ProductTypes';
 import styles from './category.module.scss';
-import { Cart_URL } from '../../constants/urls';
+
+const MALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/male`;
+const FEMALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/female`;
 
 const CategoryPage: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
-  const [priceRange, setPriceRange] = useState<number[]>([0, 5000]);
-  const [cartItems, setCartItems] = useState<{ [key: number]: number }>({});
+  const { cart, fetchCart } = useCart();
 
-  const handlePriceChange = (_event: Event, newValue: number | number[]) => {
-    setPriceRange(newValue as number[]);
+  const [categoryName, setCategoryName] = useState<string>('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [wishlistProductIds, setWishlistProductIds] = useState<Set<string>>(new Set());
+  const [quickBuyProducts, setQuickBuyProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetchProductsAndWishlist();
+  }, [location.search]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchQuery = params.get('search')?.toLowerCase() || '';
+    const selectedCategories = params.get('categories')?.split(',').map(cat => cat.toLowerCase()) || [];
+    const minPrice = parseInt(params.get('minPrice') || '0', 10);
+    const maxPrice = parseInt(params.get('maxPrice') || '1000', 10);
+    const selectedRatings = params.get('ratings')?.split(',') || [];
+
+    let currentFilteredProducts = products.map(product => {
+      const cartItem = cart?.items.find(item => item.productId === product.id);
+      return { ...product, quickBuyQuantity: cartItem ? cartItem.quantity : undefined };
+    });
+
+  
+    if (searchQuery) {
+      currentFilteredProducts = currentFilteredProducts.filter(product =>
+        product.name.toLowerCase().includes(searchQuery) ||
+        (product.title && product.title.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    if (selectedCategories.length > 0) {
+      currentFilteredProducts = currentFilteredProducts.filter(product =>
+        selectedCategories.some(category =>
+          product.name.toLowerCase().includes(category) ||
+          (product.title && product.title.toLowerCase().includes(category))
+        )
+      );
+    }
+
+    currentFilteredProducts = currentFilteredProducts.filter(product => {
+      return product.price >= minPrice && product.price <= maxPrice;
+    });
+
+    if (selectedRatings.length > 0) {
+      currentFilteredProducts = currentFilteredProducts.filter(product => {
+        const productRating = 0;
+        return selectedRatings.some(selectedRating => {
+          if (selectedRating === '4★ & above') return productRating >= 4;
+          if (selectedRating === '3★ & above') return productRating >= 3;
+          if (selectedRating === '2★ & above') return productRating >= 2;
+          if (selectedRating === '1★ & above') return productRating >= 1;
+          return false;
+        });
+      });
+    }
+
+    setFilteredProducts(currentFilteredProducts);
+  }, [products, location.search, wishlistProductIds, cart]);
+
+  const fetchProductsAndWishlist = async () => {
+    const params = new URLSearchParams(location.search);
+    const category = params.get('category');
+
+    setLoading(true);
+    setError(null);
+    try {
+      let fetchedProducts: Product[] = [];
+      if (category === 'men') {
+        const response = await fetch(MALE_PRODUCTS_URL);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.data && data.data.accessories) {
+          fetchedProducts.push(...data.data.accessories.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        if (data.data && data.data.clothing) {
+          fetchedProducts.push(...data.data.clothing.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        setCategoryName('Men\'s Collection');
+      } else if (category === 'women') {
+        const response = await fetch(FEMALE_PRODUCTS_URL);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.data && data.data.accessories) {
+          fetchedProducts.push(...data.data.accessories.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        if (data.data && data.data.clothing) {
+          fetchedProducts.push(...data.data.clothing.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        setCategoryName('Women\'s Collection');
+      } else {
+        const [maleResponse, femaleResponse] = await Promise.all([
+          fetch(MALE_PRODUCTS_URL),
+          fetch(FEMALE_PRODUCTS_URL)
+        ]);
+
+        if (!maleResponse.ok) {
+          throw new Error(`HTTP error! status: ${maleResponse.status} from male products`);
+        }
+        if (!femaleResponse.ok) {
+          throw new Error(`HTTP error! status: ${femaleResponse.status} from female products`);
+        }
+
+        const maleData = await maleResponse.json();
+        const femaleData = await femaleResponse.json();
+
+        if (maleData.data && maleData.data.accessories) {
+          fetchedProducts.push(...maleData.data.accessories.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        if (maleData.data && maleData.data.clothing) {
+          fetchedProducts.push(...maleData.data.clothing.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        if (femaleData.data && femaleData.data.accessories) {
+          fetchedProducts.push(...femaleData.data.accessories.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        if (femaleData.data && femaleData.data.clothing) {
+          fetchedProducts.push(...femaleData.data.clothing.map((item: FetchedProductItem) => ({
+            id: item.id || item._id || '',
+            name: item.title || item.name || item.productName || '',
+            title: item.description || '',
+            imageUrl: item.imageUrl,
+            price: parseFloat(item.price),
+            quantity: item.quantity,
+          })));
+        }
+        setCategoryName('All Collections');
+      }
+    
+      try {
+        const wishlistResponse = await getWishlist();
+        if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
+          const wishlistedIds = new Set<string>(wishlistResponse.data.map((item: { productId: string; _id?: string; }) => item.productId || item._id).filter((id): id is string => !!id));
+          setWishlistProductIds(wishlistedIds);
+          fetchedProducts = fetchedProducts.map(product => ({
+            ...product,
+            isWishlisted: wishlistedIds.has(product.id),
+          }));
+          setProducts(fetchedProducts);
+        } else {
+        
+          setProducts(fetchedProducts);
+          console.warn('Failed to fetch wishlist:', wishlistResponse.message);
+        }
+      } catch (wishlistError) {
+        console.warn('Error fetching wishlist (likely authentication issue):', wishlistError);
+        setProducts(fetchedProducts);
+      }
+
+    } catch (err: any) {
+      console.error('An unexpected error occurred during product/wishlist fetch:', err);
+    
+      if (err.message && err.message.startsWith('HTTP error!')) {
+        setError(`Failed to load products: ${(err as Error).message}. Please ensure the backend server is running and accessible at ${API_BASE_URL}`);
+        setProducts([]);
+      } else {
+        console.warn('Non-critical error encountered (likely authentication for wishlist/cart), displaying products:', err.message || err);
+      
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleQuantityChange = (productId: number, quantity: number) => {
-    setCartItems(prev => ({
-      ...prev,
-      [productId]: quantity
-    }));
+  const handleProductWishlistToggle = (productId: string, isWishlisted: boolean, productCategory: string) => {
+    setWishlistProductIds(prev => {
+      const newSet = new Set(prev);
+      if (isWishlisted) {
+        newSet.add(productId);
+      } else {
+        newSet.delete(productId);
+      }
+      return newSet;
+    });
+    setProducts(prevProducts =>
+      prevProducts.map(product =>
+        product.id === productId ? { ...product, isWishlisted: isWishlisted } : product
+      )
+    );
   };
 
-  const totalItemsInCart = Object.values(cartItems).reduce((sum, quantity) => sum + quantity, 0);
+  const handleUpdateQuickBuyQuantity = (product: Product, change: number) => {
+    setQuickBuyProducts(prevProducts => {
+      const existingProductIndex = prevProducts.findIndex(p => p.id === product.id);
+      let updatedProducts = [...prevProducts];
 
-  const handleViewCart = () => {
-    navigate(Cart_URL);
+      if (existingProductIndex > -1) {
+        const currentQuantity = updatedProducts[existingProductIndex].quantity || 0;
+        const newQuantity = currentQuantity + change;
+
+        if (newQuantity <= 0) {
+          updatedProducts = updatedProducts.filter(p => p.id !== product.id);
+        } else {
+          updatedProducts[existingProductIndex] = {
+            ...updatedProducts[existingProductIndex],
+            quantity: newQuantity,
+          };
+        }
+      } else if (change > 0) {
+        updatedProducts.push({ ...product, quantity: 1 });
+      }
+      return updatedProducts;
+    });
+
+  
+    setProducts(prevProducts =>
+      prevProducts.map(p => {
+        if (p.id === product.id) {
+          const currentQuickBuyQuantity = p.quickBuyQuantity || 0;
+          const newQuickBuyQuantity = currentQuickBuyQuantity + change;
+          return { ...p, quickBuyQuantity: newQuickBuyQuantity > 0 ? newQuickBuyQuantity : undefined };
+        }
+        return p;
+      })
+    );
   };
+
+  const handleViewCartSummary = async () => {
+    await fetchCart();
+    navigate('/cart');
+  };
+
+  if (loading) {
+    return (<AppLoader />);
+  }
+
+  if (error) {
+    return (
+      <Container className={styles.container}>
+        <Typography variant='h4' component='h1' className={styles.errorText}>
+          Error: {error}
+        </Typography>
+      </Container>
+    );
+  }
 
   return (
-    <Box className={styles.container}>
-      <Box className={styles.content}>
-        <Box className={styles.filterSection}>
-          <Filters 
-            priceRange={priceRange}
-            onPriceChange={handlePriceChange}
-          />
+    <Container maxWidth='xl' sx={{
+      px: '5% !important',
+    }} className={styles.container}>
+      <Box className={styles.breadcrumbs}>
+        <Breadcrumbs aria-label='breadcrumb'>
+          <Link component={RouterLink} to='/' color='inherit'>
+            Home
+          </Link>
+          <Typography color='text.primary'>{categoryName}</Typography>
+        </Breadcrumbs>
+      </Box>
+
+      <Typography variant='h4' component='h1' className={styles.title}>
+        {categoryName}
+      </Typography>
+
+      <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ width: { xs: '100%', md: '25%' } }}>
+          <CategoryFilter />
         </Box>
-        <Box className={styles.productSection}>
-          <ProductSection 
-            onQuantityChange={handleQuantityChange}
-            quantities={cartItems}
-          />
+        <Box sx={{ width: { xs: '100%', md: '75%' } }}>
+          {filteredProducts.length > 0 ? (
+            <ProductSection
+              products={filteredProducts}
+              onWishlistToggle={handleProductWishlistToggle}
+              productType="CategoryPageProduct"
+              onUpdateQuickBuyQuantity={handleUpdateQuickBuyQuantity}
+            />
+          ) : (
+            <Typography variant='body1' className={styles.noProducts}>
+              No products found for this category.
+            </Typography>
+          )}
         </Box>
       </Box>
-      {totalItemsInCart > 0 && (
-        <Button
-          variant="contained"
-          color="primary"
-          className={styles.viewCartButton}
-          onClick={handleViewCart}
+      {quickBuyProducts.length > 0 && (
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 30,
+            right: 30,
+            zIndex: 1000,
+          }}
         >
-          View Cart ({totalItemsInCart} items)
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handleViewCartSummary}
+            sx={{
+              backgroundColor: '#ff4d4d',
+              '&:hover': {
+                backgroundColor: '#e03b3b',
+              },
+              borderRadius: '20px',
+              padding: '10px 20px',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            }}
+          >
+            View Cart Summary ({cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0})
+          </Button>
+        </Box>
       )}
-    </Box>
+    </Container>
   );
 };
 
-export default CategoryPage;
+export default CategoryPage; 

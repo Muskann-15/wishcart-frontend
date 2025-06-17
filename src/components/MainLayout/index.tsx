@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Footer, Header } from '../../components';
+import { Footer, Header, ScrollToTop } from '../../components';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -8,6 +8,7 @@ interface MainLayoutProps {
 export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <>
+    <ScrollToTop />
       <Header />
       {children}
       <Footer />

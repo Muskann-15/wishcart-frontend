@@ -3,7 +3,14 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(139, 69, 19, 1));
+  background-color: #fff;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.container {
+  margin: 0 auto;
+  width: 100%;
 }
 
 .section {
@@ -26,14 +33,18 @@
 
 .slide {
   position: relative;
-  height: 80vh;
+  height: 100%;
   background-size: cover;
   background-position: center;
   display: flex !important;
   align-items: center;
   justify-content: center;
-}
 
+  img {
+    max-height: 100%;
+    width: auto;
+  }
+}
 
 .overlay {
   background: rgba(0, 0, 0, 0.4);
@@ -67,4 +78,250 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.categoryHeading {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.categoryCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.categoryImagePlaceholder {
+  width: 100%;
+  height: 150px;
+  background-color: #e0e0e0;
+  /* You can add a placeholder image or icon here */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #a0a0a0;
+  margin-bottom: 1rem;
+}
+
+.categoryCardTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.categoryCardButton {
+  background-color: #9b2cff !important;
+  color: #fff !important;
+  text-transform: capitalize !important;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #8a25e5 !important;
+  }
+}
+
+.bannerSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 2rem;
+  background-color: #f8f9fa;
+  position: relative;
+}
+
+.bannerContent {
+  flex: 1;
+  max-width: 600px;
+}
+
+.bannerTitle {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.perfectStyle {
+  background-image: linear-gradient(45deg, #FE6B8B 30%, #a855f7 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #ff4d4d;
+  /* Fallback color */
+}
+
+.bannerText {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.bannerButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.bannerImagePlaceholder {
+  width: 50%;
+  height: 400px;
+  background-color: transparent;
+  border-radius: 20px;
+  /* Add a placeholder image or icon here */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-top: 35px;
+}
+
+:global(.slick-slider) {
+  width: 100%;
+  height: 100%;
+}
+
+:global(.slick-list) {
+  height: 100%;
+}
+
+:global(.slick-track) {
+  height: 100%;
+  display: flex !important;
+  align-items: center;
+}
+
+.genderSection {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  justify-content: center;
+  margin: 0.5rem 0;
+  background-image: url('https://themewagon.github.io/majestic-2/v1.0.0/assets/img/gallery/header-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  .genderCard {
+    position: relative;
+    width: 45%;
+    max-width: 600px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, border 0.3s ease;
+  }
+}
+
+.genderImage {
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+  display: block;
+}
+
+.genderTitle {
+  position: absolute;
+  bottom: 2rem;
+  left: 2rem;
+  color: white;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-size: 1.8rem;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.arrowCircle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Circle animations */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 20, 87, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 20, 87, 0.6);
+  }
+}
+
+/* Animation classes */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Cream gradient background */
+.cream-gradient-bg {
+  background: linear-gradient(135deg,
+      hsl(var(--fashion-warm)) 0%,
+      hsl(var(--fashion-cream)) 50%,
+      white 100%);
 }

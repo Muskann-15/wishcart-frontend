@@ -1,0 +1,62 @@
+.newsletterSection {
+  padding: 4rem 2rem;
+  background-color: #333;
+  color: white;
+  text-align: center;
+}
+
+.MuiFormHelperText-root {
+  background-color: transparent !important;
+  color: red !important;
+  margin-left: 0 !important;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.sectionDescription {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.subscribeForm {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.emailInput {
+  flex: 1;
+  background-color: #fff;
+  border-radius: 4px;
+
+  .MuiOutlinedInput-notchedOutline {
+    border: none;
+  }
+
+  input {
+    padding: 0.8rem 1rem;
+    color: #333;
+  }
+}
+
+.noBorder fieldset {
+  border: none;
+}
+
+.subscribeButton {
+  background-color: #ff4d4d !important;
+  color: white !important;
+  padding: 0.8rem 2rem !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+
+  &:hover {
+    background-color: #ff3333 !important;
+  }
+}
