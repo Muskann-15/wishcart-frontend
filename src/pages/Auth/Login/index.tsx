@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../../../services/authService';
 import styles from './login.module.scss';
 import { REGISTER_URL } from '../../../constants/routes';
+import { useUser } from '../../../context/UserContext';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { setUser } = useUser()
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -26,10 +28,8 @@ const LoginPage: React.FC = () => {
         localStorage.setItem('userId', response.user?.id || '');
         localStorage.setItem('userName', response.user?.name || '');
         localStorage.setItem('userEmail', response.user?.email || '');
-        setSuccess('Login successful! Redirecting...');
-        setTimeout(() => {
-          navigate('/');
-        }, 1500);
+        setUser(response.user)
+        navigate('/');
       } else {
         setError(response.message || 'An unknown error occurred during login.');
       }
@@ -66,7 +66,6 @@ const LoginPage: React.FC = () => {
             required
           />
           {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-          {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
           <Button
             type="submit"
             variant="contained"
@@ -75,7 +74,7 @@ const LoginPage: React.FC = () => {
             className={styles.loginButton}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} /> : 'Login'}
+            {loading ? <CircularProgress size={24} sx={{color: 'white'}} /> : 'Login'}
           </Button>
         </form>
         <Typography variant="body2" className={styles.signupText}>

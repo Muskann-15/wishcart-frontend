@@ -24,6 +24,7 @@ interface CartContextType {
   fetchCart: () => Promise<void>;
   addItemToCart: (productId: string, quantity: number, price: number) => Promise<ApiResponse<ServiceCartItem>>;
   removeItemFromCart: (productId: string) => Promise<ApiResponse<ServiceCartItem>>;
+  updateCart: (cartItems: Array<{ productId: string; quantity: number; price: number; _id: string }>) => void;
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -89,7 +90,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         totalPrice,
       };
 
-      console.log('Transformed cart data:', transformedCart);
       setCart(transformedCart);
     } catch (err: any) {
       console.error('Error fetching cart:', err);
@@ -105,7 +105,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const addItemToCart = async (productId: string, quantity: number, price: number): Promise<ApiResponse<ServiceCartItem>> => {
-    setLoading(true);
+    // setLoading(true);
     setError(null);
     try {
       const numericQuantity = Number(quantity);
@@ -116,14 +116,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
 
       const response = await cartService.addToCart(productId, numericQuantity, numericPrice);
-      await fetchCart();
+      // await fetchCart();
       return response;
     } catch (err: any) {
       console.error('Failed to add item to cart:', err.message || err);
       setError(err.message || 'Failed to add item to cart');
       return { success: false, message: err.message || 'Failed to add item to cart.' };
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
@@ -143,6 +143,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
+  const updateCart = (cartItems: Array<{ productId: string; quantity: number; price: number; _id: string }>) => {
+    const transformedItems: CartItem[] = cartItems.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      name: '',
+      imageUrl: '',
+    }));
+
+    const totalQuantity = transformedItems.reduce((acc, item) => acc + item.quantity, 0);
+    const totalPrice = transformedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    setCart({
+      id: cart?.id || '',
+      userId: cart?.userId || '',
+      items: transformedItems,
+      totalQuantity,
+      totalPrice,
+    });
+  };
+
   useEffect(() => {
     fetchCart();
   }, []);
@@ -155,6 +176,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       fetchCart,
       addItemToCart,
       removeItemFromCart,
+      updateCart,
     }}>
       {children}
     </CartContext.Provider>

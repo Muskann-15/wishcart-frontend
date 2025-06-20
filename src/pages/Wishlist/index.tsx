@@ -1,63 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Container, Alert } from '@mui/material';
 import styles from './wishlist.module.scss';
-import { getWishlist, removeProductFromWishlist } from '../../services/wishlistService';
+import { removeProductFromWishlist } from '../../services/wishlistService';
 import ProductSection from '../../components/ProductsSection';
 import type { Product } from '../../type/product';
 import { AppLoader } from '../../components/Loader';
+import { useUser } from '../../context/UserContext';
 
 const WishlistPage: React.FC = () => {
-  const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user, loading, error, refreshUserDetails } = useUser();
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await getWishlist();
-        if (response.success && Array.isArray(response.data)) {
-          const mappedProducts: Product[] = response.data.map((item: any) => ({
-            id: item._id || item.productId,
-            name: item.productName || item.name || '',
-            title: item.productTitle || item.title || '',
-            imageUrl: item.imageUrl || '',
-            price: item.price ? parseFloat(item.price) : 0,
-            isWishlisted: true,
-            category: item.productType || item.category || 'unknown',
-          })).filter((product: Product) => product.id !== undefined && product.id !== null && product.id !== '');
-          setWishlistProducts(mappedProducts);
-        } else {
-          setError(response.message || 'Failed to fetch wishlist.');
-        }
-      } catch (err) {
-        console.error('Error fetching wishlist:', err);
-        setError(`Failed to load wishlist: ${(err as Error).message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWishlist();
-  }, []);
+  const wishlistProducts: Product[] = (user?.wishlist || []).map((item: any) => ({
+    id: item._id || item.productId,
+    name: item.name || '',
+    title: item.name || '',
+    imageUrl: item.imageUrl || '',
+    price: item.price ? parseFloat(item.price) : 0,
+    isWishlisted: true,
+    category: item.productType || item.category || 'unknown',
+  })).filter((product: Product) => product.id !== undefined && product.id !== null && product.id !== '');
 
   const handleProductWishlistToggle = async (productId: string, isWishlisted: boolean, productCategory: string) => {
     if (!isWishlisted) {
-      setWishlistProducts(prevProducts => prevProducts.filter(p => p.id !== productId)); 
       try {
-        const productToRemove = wishlistProducts.find(p => p.id === productId);
-        if (productToRemove) {
-          console.log('Attempting to remove wishlist item:', {
-            productId: productId,
-            productType: productToRemove.category || 'unknown',
-          });
-          await removeProductFromWishlist(productId, productToRemove.category || 'unknown');
-        } else {
-          console.warn('Product to remove not found in wishlistProducts state.');
-        }
+        await removeProductFromWishlist(productId, productCategory);
+        await refreshUserDetails();
       } catch (error) {
-        console.error('Error removing product from wishlist (API call):', error);
+        setLocalError('Error removing product from wishlist.');
       }
     }
   };
@@ -68,10 +38,10 @@ const WishlistPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error || localError) {
     return (
       <Container maxWidth='xl' className={styles.container}>
-        <Alert severity='error'>{error}</Alert>
+        <Alert severity='error'>{error || localError}</Alert>
       </Container>
     );
   }

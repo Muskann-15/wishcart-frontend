@@ -5,18 +5,21 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
 import { formatPrice } from '../../utils/formatters';
 import { useCart } from '../../context/CartContext';
-import { DummyProducts } from '../../constants/statistics';
+import { useUser } from '../../context/UserContext';
 import { AppLoader } from '../../components/Loader';
 import styles from './cart.module.scss';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cart, loading, error, removeItemFromCart } = useCart();
+  const { removeItemFromCart } = useCart();
+  const { user, loading, error, refreshUserDetails } = useUser();
 
-  const cartItems = cart?.items || [];
-  const displayCartItems = cartItems.length === 0 ? DummyProducts : cartItems;
-  const totalItems = displayCartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const totalPrice = displayCartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const cartItems = user?.cart || [];
+  const totalItems = cartItems.length;
+  const totalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+  const getItemName = (item: any) => item.name || '';
+  const getItemImageUrl = (item: any) => item.imageUrl || '';
 
   const handleContinueShopping = () => {
     navigate('/');
@@ -25,6 +28,7 @@ const CartPage: React.FC = () => {
   const handleRemoveItem = async (productId: string) => {
     try {
       await removeItemFromCart(productId);
+      await refreshUserDetails();
     } catch (error) {
       console.error('Failed to remove item:', error);
     }
@@ -70,7 +74,7 @@ const CartPage: React.FC = () => {
             Cart Summary
           </Typography>
 
-          {displayCartItems.length === 0 ? (
+          {cartItems.length === 0 ? (
             <Box className={styles.emptyCart}>
               <Typography variant="h6">Your cart is empty.</Typography>
               <Button variant="contained" color="primary" onClick={handleContinueShopping}>
@@ -80,37 +84,41 @@ const CartPage: React.FC = () => {
           ) : (
             <Box className={styles.cartContentWrapper}>
               <Box className={styles.productList}>
-                {displayCartItems.map(item => (
-                  <Card key={item.productId} className={styles.productCard}>
-                    <CardMedia
-                      component="img"
-                      image={item.imageUrl}
-                      alt={item.name}
-                      className={styles.productImage}
-                    />
-                    <CardContent className={styles.productDetails}>
-                      <Typography variant="h6" className={styles.productName}>
-                        {item.name}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        Price: {formatPrice(item.price)}
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        Quantity: {item.quantity}
-                      </Typography>
-                      <Typography variant="body1" className={styles.productSubtotal}>
-                        Subtotal: {formatPrice(item.price * item.quantity)}
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleRemoveItem(item.productId)}
-                        className={styles.removeButton}
-                        aria-label="remove item"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </CardContent>
-                  </Card>
-                ))}
+                {cartItems.filter((cart) => cart.quantity > 0).map(item => {
+                  const name = getItemName(item);
+                  const imageUrl = getItemImageUrl(item);
+                  return (
+                    <Card key={item.productId} className={styles.productCard}>
+                      <CardMedia
+                        component="img"
+                        image={imageUrl}
+                        alt={name}
+                        className={styles.productImage}
+                      />
+                      <CardContent className={styles.productDetails}>
+                        <Typography variant="h6" className={styles.productName}>
+                          {name}
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                          Price: {formatPrice(item.price)}
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                          Quantity: {item.quantity}
+                        </Typography>
+                        <Typography variant="body1" className={styles.productSubtotal}>
+                          Subtotal: {formatPrice(item.price * item.quantity)}
+                        </Typography>
+                        <IconButton
+                          onClick={() => handleRemoveItem(item.productId)}
+                          className={styles.removeButton}
+                          aria-label="remove item"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </Box>
 
               <Divider sx={{ my: 3 }} />

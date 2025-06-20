@@ -6,9 +6,10 @@ import ProductSection from '../../components/ProductsSection';
 import CategoryFilter from '../../components/CategoryFilter';
 import { AppLoader } from '../../components/Loader';
 import { getWishlist } from '../../services/wishlistService';
-import { useCart } from '../../context/CartContext';
+import { useUser } from '../../context/UserContext';
 import { API_BASE_URL } from '../../constants/api';
 import type { FetchedProductItem } from '../../types/ProductTypes';
+import { CART_URL } from '../../constants/routes';
 import styles from './category.module.scss';
 
 const MALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/male`;
@@ -17,15 +18,14 @@ const FEMALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/female`;
 const CategoryPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart, fetchCart } = useCart();
+  const { user, loading, error } = useUser();
 
   const [categoryName, setCategoryName] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [wishlistProductIds, setWishlistProductIds] = useState<Set<string>>(new Set());
-  const [quickBuyProducts, setQuickBuyProducts] = useState<Product[]>([]);
+  const [localLoading, setLoading] = useState<boolean>(true);
+  const [localError, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProductsAndWishlist();
@@ -40,11 +40,11 @@ const CategoryPage: React.FC = () => {
     const selectedRatings = params.get('ratings')?.split(',') || [];
 
     let currentFilteredProducts = products.map(product => {
-      const cartItem = cart?.items.find(item => item.productId === product.id);
-      return { ...product, quickBuyQuantity: cartItem ? cartItem.quantity : undefined };
+      const cartItem = user?.cart?.find(item => item.productId === product.id);
+      const isWishlisted = !!user?.wishlist?.find(item => item.productId === product.id);
+      return { ...product, quickBuyQuantity: cartItem ? cartItem.quantity : undefined, isWishlisted };
     });
 
-  
     if (searchQuery) {
       currentFilteredProducts = currentFilteredProducts.filter(product =>
         product.name.toLowerCase().includes(searchQuery) ||
@@ -79,7 +79,7 @@ const CategoryPage: React.FC = () => {
     }
 
     setFilteredProducts(currentFilteredProducts);
-  }, [products, location.search, wishlistProductIds, cart]);
+  }, [products, location.search, wishlistProductIds, user]);
 
   const fetchProductsAndWishlist = async () => {
     const params = new URLSearchParams(location.search);
@@ -204,7 +204,7 @@ const CategoryPage: React.FC = () => {
     
       try {
         const wishlistResponse = await getWishlist();
-        if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
+          if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
           const wishlistedIds = new Set<string>(wishlistResponse.data.map((item: { productId: string; _id?: string; }) => item.productId || item._id).filter((id): id is string => !!id));
           setWishlistProductIds(wishlistedIds);
           fetchedProducts = fetchedProducts.map(product => ({
@@ -213,7 +213,6 @@ const CategoryPage: React.FC = () => {
           }));
           setProducts(fetchedProducts);
         } else {
-        
           setProducts(fetchedProducts);
           console.warn('Failed to fetch wishlist:', wishlistResponse.message);
         }
@@ -230,7 +229,6 @@ const CategoryPage: React.FC = () => {
         setProducts([]);
       } else {
         console.warn('Non-critical error encountered (likely authentication for wishlist/cart), displaying products:', err.message || err);
-      
       }
     } finally {
       setLoading(false);
@@ -254,45 +252,11 @@ const CategoryPage: React.FC = () => {
     );
   };
 
-  const handleUpdateQuickBuyQuantity = (product: Product, change: number) => {
-    setQuickBuyProducts(prevProducts => {
-      const existingProductIndex = prevProducts.findIndex(p => p.id === product.id);
-      let updatedProducts = [...prevProducts];
-
-      if (existingProductIndex > -1) {
-        const currentQuantity = updatedProducts[existingProductIndex].quantity || 0;
-        const newQuantity = currentQuantity + change;
-
-        if (newQuantity <= 0) {
-          updatedProducts = updatedProducts.filter(p => p.id !== product.id);
-        } else {
-          updatedProducts[existingProductIndex] = {
-            ...updatedProducts[existingProductIndex],
-            quantity: newQuantity,
-          };
-        }
-      } else if (change > 0) {
-        updatedProducts.push({ ...product, quantity: 1 });
-      }
-      return updatedProducts;
-    });
-
-  
-    setProducts(prevProducts =>
-      prevProducts.map(p => {
-        if (p.id === product.id) {
-          const currentQuickBuyQuantity = p.quickBuyQuantity || 0;
-          const newQuickBuyQuantity = currentQuickBuyQuantity + change;
-          return { ...p, quickBuyQuantity: newQuickBuyQuantity > 0 ? newQuickBuyQuantity : undefined };
-        }
-        return p;
-      })
-    );
+  const handleUpdateQuickBuyQuantity = () => {
   };
 
-  const handleViewCartSummary = async () => {
-    await fetchCart();
-    navigate('/cart');
+  const handleViewCartSummary = () => {
+    navigate(CART_URL);
   };
 
   if (loading) {
@@ -308,6 +272,8 @@ const CategoryPage: React.FC = () => {
       </Container>
     );
   }
+
+  const cartCount = user?.cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
     <Container maxWidth='xl' sx={{
@@ -345,7 +311,7 @@ const CategoryPage: React.FC = () => {
           )}
         </Box>
       </Box>
-      {quickBuyProducts.length > 0 && (
+      {cartCount > 0 && (
         <Box
           sx={{
             position: 'fixed',
@@ -371,7 +337,7 @@ const CategoryPage: React.FC = () => {
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
             }}
           >
-            View Cart Summary ({cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0})
+            View Cart Summary ({cartCount})
           </Button>
         </Box>
       )}

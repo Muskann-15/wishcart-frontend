@@ -5,3 +5,9 @@ a {
 .MuiButton-root {
     text-transform: capitalize !important;
 }
+
+.slick-prev {
+    &:before {
+        content: none;
+      }
+}

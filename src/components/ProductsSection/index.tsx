@@ -4,6 +4,7 @@ import { Box, Typography, Card, CardContent, CardMedia, Button, Alert } from '@m
 import { motion } from 'framer-motion';
 import { addProductToWishlist, removeProductFromWishlist } from '../../services/wishlistService';
 import { useCart } from '../../context/CartContext';
+import { useUser } from '../../context/UserContext';
 import { PRODUCT_PAGE_URL } from '../../constants/routes';
 import type { Product } from '../../type/product';
 import { formatPrice } from '../../utils/formatters';
@@ -33,28 +34,25 @@ const itemVariants = {
 
 const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistToggle, productType, onUpdateQuickBuyQuantity }) => {
   const { addItemToCart, removeItemFromCart } = useCart();
+  const { refreshUserDetails, setUser, user } = useUser();
   const navigate = useNavigate();
 
   const [cartError, setCartError] = useState<string | null>(null);
 
   const handleWishlistClick = async (product: Product, isChecked: boolean) => {
     try {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        console.warn('Authentication token not found. Cannot update wishlist.');
+        return;
+      }
       if (isChecked) {
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-          console.warn('Authentication token not found. Cannot add to wishlist.');
-          return;
-        }
         await addProductToWishlist({ productId: product.id, name: product.name, productType: productType });
       } else {
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-          console.warn('Authentication token not found. Cannot remove from wishlist.');
-          return;
-        }
         await removeProductFromWishlist(product.id, productType);
       }
       onWishlistToggle(product.id, isChecked, product.category || 'unknown');
+      await refreshUserDetails();
     } catch (error) {
       console.error('Wishlist operation failed:', error);
     }
@@ -62,12 +60,34 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
 
   const handleAddToCart = async (product: Product) => {
     try {
-      await addItemToCart(
-        product.id,
-        1,
-        Number(product.price)
-      );
-      onUpdateQuickBuyQuantity(product, 1);
+      await addItemToCart(product.id, 1, Number(product.price));
+
+      const cartItemExists = user?.cart.some(cart => cart.productId === product.id);
+
+      let updatedCart;
+
+      if (cartItemExists) {
+        updatedCart = user?.cart.map(cart =>
+          cart.productId === product.id
+            ? { ...cart, quantity: cart.quantity + 1 }
+            : cart
+        ) || [];
+      } else {
+        updatedCart = [
+          ...(user?.cart || []),
+          {
+            productId: product.id,
+            quantity: 1,
+            price: product.price,
+          }
+        ];
+      }
+
+      setUser({
+        ...user,
+        cart: updatedCart
+      });
+
     } catch (error: any) {
       console.error('Failed to add to cart:', error);
       setCartError(error.message || 'Failed to add item to cart.');
@@ -77,7 +97,17 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
   const handleRemoveFromCart = async (product: Product) => {
     try {
       await removeItemFromCart(product.id);
-      onUpdateQuickBuyQuantity(product, -1);
+
+      const updateDeletion = user?.cart.map((cart) => cart.productId === product.id ? { ...cart, quantity: (cart.quantity && cart.quantity !== 0) ? cart.quantity - 1 : [] } : cart) || []
+
+      setUser({
+        ...user,
+        cart: [
+          ...updateDeletion
+        ]
+      })
+      // onUpdateQuickBuyQuantity(product, -1);
+      // await refreshUserDetails();
     } catch (error: any) {
       console.error('Failed to remove from cart:', error);
       setCartError(error.message || 'Failed to remove item from cart.');

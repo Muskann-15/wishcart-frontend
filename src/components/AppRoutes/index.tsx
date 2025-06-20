@@ -21,7 +21,7 @@ import {
   ExclusiveBuyingPage,
   CartPage,
 } from "../../pages";
-import { BLOGPAGE_URL, CAREERSPAGE_URL, CATEGORY_URL, COLLECTIONPAGE_URL, COMMUNITYPAGE_URL, COOKIEPAGE_URL, DOCUMENTATIONPAGE_URL, GDPRPAGE_URL, HELPPAGE_URL, LOGIN_URL, OUTLETPAGE_URL, PRESSPAGE_URL, PRODUCT_PAGE_URL, PROFILEPAGE_URL, REGISTER_URL, SEARCHPAGE_URL, TUTORIALPAGE_URL, WISHLISTPAGE_URL } from '../../constants/routes';
+import { BLOGPAGE_URL, CAREERSPAGE_URL, CART_URL, CATEGORY_URL, COLLECTIONPAGE_URL, COMMUNITYPAGE_URL, COOKIEPAGE_URL, DOCUMENTATIONPAGE_URL, GDPRPAGE_URL, HELPPAGE_URL, LOGIN_URL, OUTLETPAGE_URL, PRESSPAGE_URL, PRODUCT_PAGE_URL, PROFILEPAGE_URL, REGISTER_URL, SEARCHPAGE_URL, TUTORIALPAGE_URL, WISHLISTPAGE_URL } from '../../constants/routes';
 
 export default function AppRoutes() {
   return (
@@ -45,7 +45,7 @@ export default function AppRoutes() {
       <Route path={PROFILEPAGE_URL} element={<ProfilePage />} />
       <Route path={WISHLISTPAGE_URL} element={<WishlistPage />} />
       <Route path={`${PRODUCT_PAGE_URL}/:id`} element={<ExclusiveBuyingPage />} />
-      <Route path="/cart" element={<CartPage />} />
+      <Route path={CART_URL} element={<CartPage />} />
     </Routes>
   )
 }

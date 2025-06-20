@@ -66,22 +66,22 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const getProductsData = async () => {
-      try {
-        const fetchedBestSellersResponse = await fetchBestSellers();
-        setBestSellers(fetchedBestSellersResponse.data);
-
-        const fetchedNewArrivalsResponse = await fetchNewArrivals();
-        setNewArrivals(fetchedNewArrivalsResponse.data);
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     getProductsData();
   }, []);
+
+  const getProductsData = async () => {
+    try {
+      const fetchedBestSellersResponse = await fetchBestSellers();
+      setBestSellers(fetchedBestSellersResponse.data);
+
+      const fetchedNewArrivalsResponse = await fetchNewArrivals();
+      setNewArrivals(fetchedNewArrivalsResponse.data);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSectionClick = (sectionName: string) => {
     navigate(`/shop?category=${sectionName.toLowerCase()}`);
@@ -101,7 +101,6 @@ const HomePage: React.FC = () => {
         transition={{ duration: 0.6 }}
       >
         <Box className={`${styles.bannerSection} cream-gradient-bg`} sx={{ position: 'relative', overflow: 'hidden' }}>
-          {/* Animated floating circles */}
           <Box
             className={styles.animateFloat}
             sx={{
@@ -114,7 +113,6 @@ const HomePage: React.FC = () => {
               borderRadius: '50%'
             }}
           />
-
           <Box
             className="absolute bottom-20 right-10 w-24 h-24 bg-purple-500/10 rounded-full animate-float"
             sx={{
@@ -128,7 +126,6 @@ const HomePage: React.FC = () => {
               animationDelay: '1s'
             }}
           />
-
           <Box
             className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full animate-float"
             sx={{
@@ -141,7 +138,6 @@ const HomePage: React.FC = () => {
               borderRadius: '50%'
             }}
           />
-
           <Box
             className="absolute top-1/2 left-1/4 w-16 h-16 bg-pink-500/10 rounded-full animate-float"
             sx={{
@@ -155,8 +151,6 @@ const HomePage: React.FC = () => {
               animationDelay: '2s'
             }}
           />
-
-          {/* Glowing accent circles */}
           <Box
             className="absolute top-1/3 right-1/3 w-20 h-20 bg-primary rounded-full animate-glow"
             sx={{
@@ -237,7 +231,6 @@ const HomePage: React.FC = () => {
           </Box>
         </Box>
       </motion.div>
-
 
       {/* For Her and For Him Section */}
       <Box className={styles.genderSection}>

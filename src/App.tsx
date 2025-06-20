@@ -5,6 +5,7 @@ import theme from "./constants/theme.ts";
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './components/AppRoutes/index.tsx';
 import { CartProvider } from './context/CartContext';
+import { UserProvider } from './context/UserContext';
 import './index.css';
 import '@fontsource/poppins/300.css';
 import '@fontsource/poppins/400.css';
@@ -16,13 +17,15 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <CartProvider>
-        <BrowserRouter>
-          <MainLayout>
-            <AppRoutes />
-          </MainLayout>
-        </BrowserRouter>
-      </CartProvider>
+      <UserProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <MainLayout>
+              <AppRoutes />
+            </MainLayout>
+          </BrowserRouter>
+        </CartProvider>
+      </UserProvider>
     </ThemeProvider>
   );
 };

@@ -6,24 +6,24 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonIcon from '@mui/icons-material/Person';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import SearchBar from '../SearchBar';
-import { useCart } from '../../context/CartContext';
+import { useUser } from '../../context/UserContext';
 import { LOGIN_URL, REGISTER_URL } from '../../constants/routes';
 import styles from './header.module.scss';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const token = localStorage.getItem('jwtToken');
-  const userName = localStorage.getItem('userName') || 'User';
-  const userEmail = localStorage.getItem('userEmail') || 'user@example.com';
+  const { user, setUser } = useUser();
   const [isScrolled, setIsScrolled] = useState(false);
-
-  const { cart } = useCart();
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
   const [showSearchBar, setShowSearchBar] = useState(false);
+  console.log("user", user)
+  const cartCount = user?.cart?.reduce((total, item) => total + item.quantity, 0) || 0;
+  const wishlistCount = user?.wishlist?.length || 0;
+  const userName = user?.name || '';
+  const userEmail = user?.email || '';
+  const token = localStorage.getItem('jwtToken');
 
   useEffect(() => {
     setShowSearchBar(location.pathname === '/shop');
@@ -47,6 +47,7 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.clear();
+    setUser(null)
     setAnchorEl(null);
     navigate(LOGIN_URL);
   };
@@ -83,8 +84,7 @@ const Header: React.FC = () => {
         </Link>
         <Link
           to="/shop"
-          className={`${styles.navLink} ${location.pathname === '/shop' && !location.search.includes('category=') ? styles.activeLink : ''
-            }`}
+          className={`${styles.navLink} ${location.pathname === '/shop' && !location.search.includes('category=') ? styles.activeLink : ''}`}
         >
           Collection
         </Link>
@@ -105,7 +105,7 @@ const Header: React.FC = () => {
         {token ?
           <>
             <PhoneIcon className={styles.icon} onClick={() => handleIconClick('Phone')} />
-            <Badge badgeContent={cart?.totalQuantity || 0} color="primary">
+            <Badge badgeContent={cartCount} color="primary">
               <ShoppingCartIcon className={styles.icon} onClick={() => handleIconClick('Cart')} />
             </Badge>
             <IconButton
@@ -163,7 +163,9 @@ const Header: React.FC = () => {
                 Logout
               </MenuItem>
             </Menu>
-            <FavoriteBorderIcon className={styles.icon} onClick={() => handleIconClick('Favorite')} />
+            <Badge badgeContent={wishlistCount} color="primary">
+              <FavoriteBorderIcon className={styles.icon} onClick={() => handleIconClick('Favorite')} />
+            </Badge>
           </>
           :
           <>
