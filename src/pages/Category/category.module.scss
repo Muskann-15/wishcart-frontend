@@ -90,11 +90,11 @@
   fill: var(--red);
 }
 
-.con-like .like:checked ~ .checkmark .filled {
+.con-like .like:checked~.checkmark .filled {
   display: block;
 }
 
-.con-like .like:checked ~ .checkmark .celebrate {
+.con-like .like:checked~.checkmark .celebrate {
   display: block;
 }
 
@@ -129,4 +129,4 @@
     opacity: 0;
     display: none;
   }
-} 
+}

@@ -201,10 +201,10 @@ const CategoryPage: React.FC = () => {
         }
         setCategoryName('All Collections');
       }
-    
+
       try {
         const wishlistResponse = await getWishlist();
-          if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
+        if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
           const wishlistedIds = new Set<string>(wishlistResponse.data.map((item: { productId: string; _id?: string; }) => item.productId || item._id).filter((id): id is string => !!id));
           setWishlistProductIds(wishlistedIds);
           fetchedProducts = fetchedProducts.map(product => ({
@@ -223,7 +223,7 @@ const CategoryPage: React.FC = () => {
 
     } catch (err: any) {
       console.error('An unexpected error occurred during product/wishlist fetch:', err);
-    
+
       if (err.message && err.message.startsWith('HTTP error!')) {
         setError(`Failed to load products: ${(err as Error).message}. Please ensure the backend server is running and accessible at ${API_BASE_URL}`);
         setProducts([]);
@@ -266,7 +266,7 @@ const CategoryPage: React.FC = () => {
   if (error) {
     return (
       <Container className={styles.container}>
-        <Typography variant='h4' component='h1' className={styles.errorText}>
+        <Typography variant='h4' component='h1' className={styles.errorText} style={{ marginTop: '8%' }}>
           Error: {error}
         </Typography>
       </Container>

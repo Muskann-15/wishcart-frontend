@@ -1,25 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Container, Card, CardContent, CardMedia, Button, Divider, IconButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Container,
+  Card,
+  CardContent,
+  CardMedia,
+  Button,
+  Divider,
+  IconButton,
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
 import { formatPrice } from '../../utils/formatters';
 import { useCart } from '../../context/CartContext';
-import { useUser } from '../../context/UserContext';
 import { AppLoader } from '../../components/Loader';
 import styles from './cart.module.scss';
+import { initiateHostedCheckout } from '../../services/paymentService';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { removeItemFromCart } = useCart();
-  const { user, loading, error, refreshUserDetails } = useUser();
+  const { cart, loading, error, removeItemFromCart } = useCart();
 
-  const cartItems = user?.cart || [];
+  const cartItems = cart?.items || [];
   const totalItems = cartItems.length;
-  const totalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
-  const getItemName = (item: any) => item.name || '';
-  const getItemImageUrl = (item: any) => item.imageUrl || '';
+  const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleContinueShopping = () => {
     navigate('/');
@@ -28,30 +34,61 @@ const CartPage: React.FC = () => {
   const handleRemoveItem = async (productId: string) => {
     try {
       await removeItemFromCart(productId);
-      await refreshUserDetails();
     } catch (error) {
       console.error('Failed to remove item:', error);
     }
   };
+
+  const redirectToHostedCheckout = (url: string, params: Record<string, string>) => {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = url;
+
+    for (const [key, value] of Object.entries(params)) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = String(value); // ensure string
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  };
+
+  const initializePayment = async () => {
+    console.log("res-->>>>>>")
+    try {
+      const res = await initiateHostedCheckout(totalPrice);
+      console.log("res", res)
+      if (res.success && res.url && res.params) {
+        redirectToHostedCheckout(res.url, res.params); // Redirect via POST
+      } else {
+        console.log('❌ Invalid response from server');
+      }
+    } catch (err: any) {
+      console.log('❌ Payment failed: ' + err.message);
+    }
+  }
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5 }
-    }
+      transition: { duration: 0.5 },
+    },
   };
 
-  if (loading) {
-    return ( <AppLoader />);
-  }
+  if (loading) return <AppLoader />;
 
   if (error) {
     return (
       <Box>
         <Container maxWidth="md" className={styles.cartContainer}>
-          <Typography variant="h6" color="error">Error: {error}</Typography>
+          <Typography variant="h6" color="error">
+            Error: {error}
+          </Typography>
           <Button variant="contained" color="primary" onClick={handleContinueShopping}>
             Continue Shopping
           </Button>
@@ -84,20 +121,19 @@ const CartPage: React.FC = () => {
           ) : (
             <Box className={styles.cartContentWrapper}>
               <Box className={styles.productList}>
-                {cartItems.filter((cart) => cart.quantity > 0).map(item => {
-                  const name = getItemName(item);
-                  const imageUrl = getItemImageUrl(item);
-                  return (
+                {cartItems
+                  .filter((item) => item.quantity > 0)
+                  .map((item) => (
                     <Card key={item.productId} className={styles.productCard}>
                       <CardMedia
                         component="img"
-                        image={imageUrl}
-                        alt={name}
+                        image={item.imageUrl}
+                        alt={item.name}
                         className={styles.productImage}
                       />
                       <CardContent className={styles.productDetails}>
                         <Typography variant="h6" className={styles.productName}>
-                          {name}
+                          {item.name}
                         </Typography>
                         <Typography variant="body1" color="text.secondary">
                           Price: {formatPrice(item.price)}
@@ -117,8 +153,7 @@ const CartPage: React.FC = () => {
                         </IconButton>
                       </CardContent>
                     </Card>
-                  );
-                })}
+                  ))}
               </Box>
 
               <Divider sx={{ my: 3 }} />
@@ -130,9 +165,15 @@ const CartPage: React.FC = () => {
                 <Typography variant="h5" className={styles.summaryText}>
                   Total Price: {formatPrice(totalPrice)}
                 </Typography>
-                <Button variant="contained" color="primary" className={styles.checkoutButton} onClick={() => alert('Proceed to checkout!')}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={styles.checkoutButton}
+                  onClick={initializePayment}
+                >
                   Proceed to Checkout
                 </Button>
+
               </Box>
             </Box>
           )}
@@ -142,4 +183,4 @@ const CartPage: React.FC = () => {
   );
 };
 
-export default CartPage; 
+export default CartPage;

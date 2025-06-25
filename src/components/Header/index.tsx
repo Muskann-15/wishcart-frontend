@@ -18,7 +18,6 @@ const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [showSearchBar, setShowSearchBar] = useState(false);
-  console.log("user", user)
   const cartCount = user?.cart?.reduce((total, item) => total + item.quantity, 0) || 0;
   const wishlistCount = user?.wishlist?.length || 0;
   const userName = user?.name || '';
