@@ -6,10 +6,15 @@ import ProductSection from '../../components/ProductsSection';
 import type { Product } from '../../type/product';
 import { AppLoader } from '../../components/Loader';
 import { useUser } from '../../context/UserContext';
+import { useDispatch } from 'react-redux';
+import { updateLoadingValue } from '../../redux/userData/userSlice';
 
 const WishlistPage: React.FC = () => {
   const { user, loading, error, refreshUserDetails } = useUser();
   const [localError, setLocalError] = useState<string | null>(null);
+
+  const dispatch = useDispatch();
+  dispatch(updateLoadingValue(false))
 
   const wishlistProducts: Product[] = (user?.wishlist || []).map((item: any) => ({
     id: item._id || item.productId,

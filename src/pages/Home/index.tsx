@@ -11,6 +11,8 @@ import CustomButton from '../../components/CustomButton';
 import { statistics } from '../../constants/statistics';
 import { AppLoader } from '../../components/Loader';
 import styles from './home.module.scss';
+import { useDispatch } from 'react-redux';
+import { updateLoadingValue } from '../../redux/userData/userSlice';
 
 const MotionBox = motion(Box);
 
@@ -62,6 +64,7 @@ const HomePage: React.FC = () => {
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch()
 
   const navigate = useNavigate();
 
@@ -70,6 +73,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   const getProductsData = async () => {
+    dispatch(updateLoadingValue(true))
     try {
       const fetchedBestSellersResponse = await fetchBestSellers();
       setBestSellers(fetchedBestSellersResponse.data);

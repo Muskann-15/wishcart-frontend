@@ -19,6 +19,7 @@ interface UserData {
     price: number;
     _id: string;
   }>;
+  accountType: string
 }
 
 interface AuthResponse {

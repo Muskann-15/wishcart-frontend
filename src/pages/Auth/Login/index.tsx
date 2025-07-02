@@ -28,6 +28,7 @@ const LoginPage: React.FC = () => {
         localStorage.setItem('userId', response.user?.id || '');
         localStorage.setItem('userName', response.user?.name || '');
         localStorage.setItem('userEmail', response.user?.email || '');
+        localStorage.setItem('accountType', response.user?.accountType || '');
         setUser(response.user)
         navigate('/');
       } else {
