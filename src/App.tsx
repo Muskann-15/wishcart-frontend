@@ -1,9 +1,9 @@
 import React from 'react';
 import { Provider } from "react-redux"
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { MainLayout } from './components';
-import theme from "./constants/theme.ts";
 import { BrowserRouter } from 'react-router-dom';
+import { MainLayout, Toast } from './components';
+import theme from "./constants/theme.ts";
 import AppRoutes from './components/AppRoutes/index.tsx';
 import { CartProvider } from './context/CartContext';
 import { UserProvider } from './context/UserContext';
@@ -30,6 +30,7 @@ const App: React.FC = () => {
         </CartProvider>
       </UserProvider>
       </Provider>
+      <Toast />
     </ThemeProvider>
   );
 };

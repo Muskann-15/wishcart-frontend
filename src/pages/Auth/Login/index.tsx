@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
             className={styles.loginButton}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} sx={{color: 'white'}} /> : 'Login'}
+            {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Login'}
           </Button>
         </form>
         <Typography variant="body2" className={styles.signupText}>

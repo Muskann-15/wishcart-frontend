@@ -202,22 +202,28 @@ const CategoryPage: React.FC = () => {
         setCategoryName('All Collections');
       }
 
-      try {
-        const wishlistResponse = await getWishlist();
-        if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
-          const wishlistedIds = new Set<string>(wishlistResponse.data.map((item: { productId: string; _id?: string; }) => item.productId || item._id).filter((id): id is string => !!id));
-          setWishlistProductIds(wishlistedIds);
-          fetchedProducts = fetchedProducts.map(product => ({
-            ...product,
-            isWishlisted: wishlistedIds.has(product.id),
-          }));
+      // Only fetch wishlist if user is logged in
+      if (user) {
+        try {
+          const wishlistResponse = await getWishlist();
+          if (wishlistResponse.success && Array.isArray(wishlistResponse.data)) {
+            const wishlistedIds = new Set<string>(wishlistResponse.data.map((item: { productId: string; _id?: string; }) => item.productId || item._id).filter((id): id is string => !!id));
+            setWishlistProductIds(wishlistedIds);
+            fetchedProducts = fetchedProducts.map(product => ({
+              ...product,
+              isWishlisted: wishlistedIds.has(product.id),
+            }));
+            setProducts(fetchedProducts);
+          } else {
+            setProducts(fetchedProducts);
+            console.warn('Failed to fetch wishlist:', wishlistResponse.message);
+          }
+        } catch (wishlistError) {
+          console.warn('Error fetching wishlist (likely authentication issue):', wishlistError);
           setProducts(fetchedProducts);
-        } else {
-          setProducts(fetchedProducts);
-          console.warn('Failed to fetch wishlist:', wishlistResponse.message);
         }
-      } catch (wishlistError) {
-        console.warn('Error fetching wishlist (likely authentication issue):', wishlistError);
+      } else {
+        // User not logged in, just show products
         setProducts(fetchedProducts);
       }
 
@@ -259,15 +265,15 @@ const CategoryPage: React.FC = () => {
     navigate(CART_URL);
   };
 
-  if (loading) {
+  if (localLoading) {
     return (<AppLoader />);
   }
 
-  if (error) {
+  if (localError) {
     return (
       <Container className={styles.container}>
         <Typography variant='h4' component='h1' className={styles.errorText} style={{ marginTop: '8%' }}>
-          Error: {error}
+          Error: {localError}
         </Typography>
       </Container>
     );

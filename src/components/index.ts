@@ -10,6 +10,7 @@ import NewsletterSection from "./NewsletterSection";
 import ProductSection from "./ProductsSection";
 import SearchBar from "./SearchBar";
 import ScrollToTop from "./ScrollPage";
+import { Toast } from "./Toast";
 
 export {
     AppRoutes,
@@ -23,5 +24,6 @@ export {
     NewsletterSection,
     ProductSection,
     SearchBar,
-    ScrollToTop
+    ScrollToTop,
+    Toast
 }

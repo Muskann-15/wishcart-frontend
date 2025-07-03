@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../constants/api';
+import Axios from '../utils/axios';
 
 export interface CartItem {
   productId: string;
@@ -60,7 +61,7 @@ export const cartService = {
     };
 
     try {
-      const response = await axios.post<ApiResponse<CartItem>>(`${API_BASE_URL}/cart/add`, payload, {
+      const response = await Axios.post<ApiResponse<CartItem>>(`${API_BASE_URL}/cart/add`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -80,7 +81,7 @@ export const cartService = {
     }
 
     try {
-      const response = await axios.delete<ApiResponse<CartItem>>(`${API_BASE_URL}/cart/${productId}`, {
+      const response = await Axios.delete<ApiResponse<CartItem>>(`${API_BASE_URL}/cart/${productId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -99,7 +100,7 @@ export const cartService = {
     }
 
     try {
-      const response = await axios.get<ApiResponse<BackendCart>>(`${API_BASE_URL}/cart`, {
+      const response = await Axios.get<ApiResponse<BackendCart>>(`${API_BASE_URL}/cart`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
