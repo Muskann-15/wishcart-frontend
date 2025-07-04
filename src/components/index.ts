@@ -11,19 +11,21 @@ import ProductSection from "./ProductsSection";
 import SearchBar from "./SearchBar";
 import ScrollToTop from "./ScrollPage";
 import { Toast } from "./Toast";
+import { ErrorBoundary } from "./ErrorBoundary";
 
 export {
-    AppRoutes,
-    BestSellersSection,
-    ContactUsSection,
-    EverydayCollectionSection,
-    Footer,
-    Header,
-    MainLayout,
-    NewArrivalsSection,
-    NewsletterSection,
-    ProductSection,
-    SearchBar,
-    ScrollToTop,
-    Toast
+  AppRoutes,
+  BestSellersSection,
+  ContactUsSection,
+  EverydayCollectionSection,
+  Footer,
+  Header,
+  MainLayout,
+  NewArrivalsSection,
+  NewsletterSection,
+  ProductSection,
+  SearchBar,
+  ScrollToTop,
+  Toast,
+  ErrorBoundary
 }

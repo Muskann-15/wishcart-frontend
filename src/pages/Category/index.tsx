@@ -4,13 +4,15 @@ import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/mate
 import type { Product } from '../../type/product';
 import ProductSection from '../../components/ProductsSection';
 import CategoryFilter from '../../components/CategoryFilter';
-import { AppLoader } from '../../components/Loader';
+// import { AppLoader } from '../../components/Loader';
 import { getWishlist } from '../../services/wishlistService';
 import { useUser } from '../../context/UserContext';
 import { API_BASE_URL } from '../../constants/api';
 import type { FetchedProductItem } from '../../types/ProductTypes';
 import { CART_URL } from '../../constants/routes';
 import styles from './category.module.scss';
+import ProductCardSkeleton from '../../components/ProductCardSkeleton';
+import CategoryFilterSkeleton from '../../components/CategoryFilterSkeleton';
 
 const MALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/male`;
 const FEMALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/female`;
@@ -202,7 +204,6 @@ const CategoryPage: React.FC = () => {
         setCategoryName('All Collections');
       }
 
-      // Only fetch wishlist if user is logged in
       if (user) {
         try {
           const wishlistResponse = await getWishlist();
@@ -223,7 +224,6 @@ const CategoryPage: React.FC = () => {
           setProducts(fetchedProducts);
         }
       } else {
-        // User not logged in, just show products
         setProducts(fetchedProducts);
       }
 
@@ -265,10 +265,6 @@ const CategoryPage: React.FC = () => {
     navigate(CART_URL);
   };
 
-  if (localLoading) {
-    return (<AppLoader />);
-  }
-
   if (localError) {
     return (
       <Container className={styles.container}>
@@ -282,14 +278,10 @@ const CategoryPage: React.FC = () => {
   const cartCount = user?.cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
   return (
-    <Container maxWidth='xl' sx={{
-      px: '5% !important',
-    }} className={styles.container}>
+    <Container maxWidth='xl' sx={{ px: '5% !important' }} className={styles.container}>
       <Box className={styles.breadcrumbs}>
         <Breadcrumbs aria-label='breadcrumb'>
-          <Link component={RouterLink} to='/' color='inherit'>
-            Home
-          </Link>
+          <Link component={RouterLink} to='/' color='inherit'>Home</Link>
           <Typography color='text.primary'>{categoryName}</Typography>
         </Breadcrumbs>
       </Box>
@@ -300,20 +292,30 @@ const CategoryPage: React.FC = () => {
 
       <Box sx={{ display: 'flex', gap: 3 }}>
         <Box sx={{ width: { xs: '100%', md: '25%' } }}>
-          <CategoryFilter />
+          {localLoading ? <CategoryFilterSkeleton /> : <CategoryFilter />}
         </Box>
         <Box sx={{ width: { xs: '100%', md: '75%' } }}>
-          {filteredProducts.length > 0 ? (
-            <ProductSection
-              products={filteredProducts}
-              onWishlistToggle={handleProductWishlistToggle}
-              productType="CategoryPageProduct"
-              onUpdateQuickBuyQuantity={handleUpdateQuickBuyQuantity}
-            />
+          {localLoading ? (
+            <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <Box key={idx} sx={{ width: { xs: '100%', sm: '45%', md: '48%' }, mb: 3 }}>
+                  <ProductCardSkeleton />
+                </Box>
+              ))}
+            </Box>
           ) : (
-            <Typography variant='body1' className={styles.noProducts}>
-              No products found for this category.
-            </Typography>
+            filteredProducts.length > 0 ? (
+              <ProductSection
+                products={filteredProducts}
+                onWishlistToggle={handleProductWishlistToggle}
+                productType="CategoryPageProduct"
+                onUpdateQuickBuyQuantity={handleUpdateQuickBuyQuantity}
+              />
+            ) : (
+              <Typography variant='body1' className={styles.noProducts}>
+                No products found for this category.
+              </Typography>
+            )
           )}
         </Box>
       </Box>

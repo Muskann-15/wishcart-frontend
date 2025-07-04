@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from "react-redux"
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { BrowserRouter } from 'react-router-dom';
-import { MainLayout, Toast } from './components';
+import { ErrorBoundary, MainLayout, Toast } from './components';
 import theme from "./constants/theme.ts";
 import AppRoutes from './components/AppRoutes/index.tsx';
 import { CartProvider } from './context/CartContext';
@@ -20,15 +20,17 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Provider store={store}>
-      <UserProvider>
-        <CartProvider>
-          <BrowserRouter>
-            <MainLayout>
-              <AppRoutes />
-            </MainLayout>
-          </BrowserRouter>
-        </CartProvider>
-      </UserProvider>
+        <UserProvider>
+          <CartProvider>
+            <BrowserRouter>
+              <MainLayout>
+                <ErrorBoundary>
+                  <AppRoutes />
+                </ErrorBoundary>
+              </MainLayout>
+            </BrowserRouter>
+          </CartProvider>
+        </UserProvider>
       </Provider>
       <Toast />
     </ThemeProvider>
