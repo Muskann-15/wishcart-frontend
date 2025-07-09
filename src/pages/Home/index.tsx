@@ -3,16 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import "tailwindcss";
+import { useDispatch } from 'react-redux';
 import { fetchBestSellers, fetchNewArrivals } from '../../services/productService';
 import type { Product } from '../../type/product';
-import { BestSellersSection, ContactUsSection, EverydayCollectionSection, NewArrivalsSection, NewsletterSection } from '../../components';
-import CustomButton from '../../components/CustomButton';
+import { AppLoader, BestSellersSection, ContactUsSection, CustomButton, EverydayCollectionSection, NewArrivalsSection, NewsletterSection } from '../../components';
 import { statistics } from '../../constants/statistics';
-import { AppLoader } from '../../components/Loader';
-import styles from './home.module.scss';
-import { useDispatch } from 'react-redux';
 import { updateLoadingValue } from '../../redux/userData/userSlice';
+import styles from './home.module.scss';
+import { fetchUserDetail } from '../../redux/userData/userApi';
+import type { AppDispatch } from '../../config/store';
 
 const MotionBox = motion(Box);
 
@@ -64,12 +63,12 @@ const HomePage: React.FC = () => {
   const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate();
 
   useEffect(() => {
     getProductsData();
+    dispatch(fetchUserDetail())
   }, []);
 
   const getProductsData = async () => {

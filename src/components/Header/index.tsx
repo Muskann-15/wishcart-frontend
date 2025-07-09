@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Box, Typography, Menu, MenuItem, IconButton, Badge } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -8,6 +9,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import SearchBar from '../SearchBar';
 import { useUser } from '../../context/UserContext';
 import { LOGIN_URL, REGISTER_URL } from '../../constants/routes';
+import type { RootState } from '../../config/store';
 import styles from './header.module.scss';
 
 const Header: React.FC = () => {
@@ -18,7 +20,8 @@ const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [showSearchBar, setShowSearchBar] = useState(false);
-  const cartCount = user?.cart?.reduce((total, item) => total + item.quantity, 0) || 0;
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const wishlistCount = user?.wishlist?.length || 0;
   const userName = user?.name || '';
   const userEmail = user?.email || '';

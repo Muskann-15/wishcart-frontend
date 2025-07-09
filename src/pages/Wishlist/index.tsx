@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Box, Typography, Container, Alert } from '@mui/material';
-import styles from './wishlist.module.scss';
 import { removeProductFromWishlist } from '../../services/wishlistService';
-import ProductSection from '../../components/ProductsSection';
+import { AppLoader, ProductSection } from '../../components';
 import type { Product } from '../../type/product';
-import { AppLoader } from '../../components/Loader';
 import { useUser } from '../../context/UserContext';
 import { useDispatch } from 'react-redux';
 import { updateLoadingValue } from '../../redux/userData/userSlice';
+import styles from './wishlist.module.scss';
 
 const WishlistPage: React.FC = () => {
   const { user, loading, error, refreshUserDetails } = useUser();

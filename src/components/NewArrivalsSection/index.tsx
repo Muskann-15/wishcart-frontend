@@ -99,7 +99,8 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({ groupedProducts
 
   return (
     <Box className={styles.newArrivalsSection}>
-      <Typography variant="h4" component="h2" className={styles.sectionTitle} sx={{ marginBottom: '2%' }}>
+      <Typography variant="h4" component="h2" className={`${styles.sectionTitle} font-satoshi`}
+        sx={{ marginBottom: '2%' }}>
         Explore New Arrivals
       </Typography>
       <Typography variant="body2" className={styles.sectionDescription} sx={{ marginBottom: '3%', maxWidth: '60%', marginLeft: '20%' }}>

@@ -2,9 +2,8 @@ import React from 'react';
 import { Provider } from "react-redux"
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { BrowserRouter } from 'react-router-dom';
-import { ErrorBoundary, MainLayout, Toast } from './components';
 import theme from "./constants/theme.ts";
-import AppRoutes from './components/AppRoutes/index.tsx';
+import { MainLayout, ErrorBoundary, AppRoutes, Toast } from './components/index.ts';
 import { CartProvider } from './context/CartContext';
 import { UserProvider } from './context/UserContext';
 import './index.css';

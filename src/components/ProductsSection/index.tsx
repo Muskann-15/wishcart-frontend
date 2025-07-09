@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Card, CardContent, CardMedia, Button, Alert } from '@mui/material';
 import { motion } from 'framer-motion';
 import { addProductToWishlist, removeProductFromWishlist } from '../../services/wishlistService';
-import { useCart } from '../../context/CartContext';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '../../config/store';
+import { addToCart, removeFromCart } from '../../redux/cartData/cartApi';
 import { useUser } from '../../context/UserContext';
 import { PRODUCT_PAGE_URL } from '../../constants/routes';
 import type { Product } from '../../type/product';
@@ -32,10 +34,11 @@ const itemVariants = {
   show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } },
 };
 
-const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistToggle, productType, onUpdateQuickBuyQuantity }) => {
-  const { addItemToCart, removeItemFromCart } = useCart();
-  const { refreshUserDetails, setUser, user } = useUser();
+const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistToggle, productType }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
   const navigate = useNavigate();
+  const { refreshUserDetails } = useUser();
 
   const [cartError, setCartError] = useState<string | null>(null);
 
@@ -60,34 +63,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
 
   const handleAddToCart = async (product: Product) => {
     try {
-      await addItemToCart(product.id, 1, Number(product.price));
-
-      const cartItemExists = user?.cart.some(cart => cart.productId === product.id);
-
-      let updatedCart;
-
-      if (cartItemExists) {
-        updatedCart = user?.cart.map(cart =>
-          cart.productId === product.id
-            ? { ...cart, quantity: cart.quantity + 1 }
-            : cart
-        ) || [];
-      } else {
-        updatedCart = [
-          ...(user?.cart || []),
-          {
-            productId: product.id,
-            quantity: 1,
-            price: product.price,
-          }
-        ];
-      }
-
-      setUser({
-        ...user,
-        cart: updatedCart
-      });
-
+      await dispatch(addToCart({ productId: product.id, quantity: 1, price: Number(product.price) }));
     } catch (error: any) {
       console.error('Failed to add to cart:', error);
       setCartError(error.message || 'Failed to add item to cart.');
@@ -96,18 +72,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
 
   const handleRemoveFromCart = async (product: Product) => {
     try {
-      await removeItemFromCart(product.id);
-
-      const updateDeletion = user?.cart.map((cart) => cart.productId === product.id ? { ...cart, quantity: (cart.quantity && cart.quantity !== 0) ? cart.quantity - 1 : [] } : cart) || []
-
-      setUser({
-        ...user,
-        cart: [
-          ...updateDeletion
-        ]
-      })
-      // onUpdateQuickBuyQuantity(product, -1);
-      // await refreshUserDetails();
+      await dispatch(removeFromCart(product.id));
     } catch (error: any) {
       console.error('Failed to remove from cart:', error);
       setCartError(error.message || 'Failed to remove item from cart.');
@@ -136,71 +101,75 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
         initial="hidden"
         animate="show"
       >
-        {products.map(product => (
-          <motion.div
-            key={product.id}
-            className={styles.cardContainer}
-            variants={itemVariants}
-            whileHover="hover"
-            initial="hidden"
-            animate="show"
-          >
-            <Card className={styles.card}>
-              <Box className={styles.imageWrapper}>
-                <CardMedia
-                  key={`media-${product.id}`}
-                  component="img"
-                  image={product.imageUrl}
-                  alt={product.title || product.name}
-                  className={styles.image}
-                />
-                <div key={`wishlist-${product.id}`} className={styles.wishlistIcon}>
-                  <label className={styles['con-like']}>
-                    <input
-                      type="checkbox"
-                      className={styles.like}
-                      checked={product.isWishlisted || false}
-                      onChange={(e) => handleWishlistClick(product, e.target.checked)}
-                    />
-                    <div className={styles.checkmark}>
-                      <svg key={`outline-${product.id}`} viewBox="0 0 24 24" className={styles.outline} xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                        <path d="M17.5,1.917a6.476,6.476,0,0,0-5.5,3.3,6.476,6.476,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,11.922,12.586a1.065,1.065,0,0,0,.156,0c7.135-3.073,11.922-8.039,11.922-12.586A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.535L12,18.473l-1.915,2A15.138,15.138,0,0,1,2,8.967A4.87,4.87,0,0,1,6.5,4.917a4.679,4.679,0,0,1,4.5,3.334A1.065,1.065,0,0,0,12,8.607a1.065,1.065,0,0,0,.979-.356A4.679,4.679,0,0,1,17.5,4.917a4.87,4.87,0,0,1,4.5,4.05C22,14.65,17.214,19.615,13.915,20.452Z"></path>
-                      </svg>
-                      <svg key={`filled-${product.id}`} viewBox="0 0 24 24" className={styles.filled} xmlns="http://www.w3.org/2000/svg" width="24" height="24">
-                        <path d="M17.5,1.917a6.476,6.476,0,0,0-5.5,3.3,6.476,6.476,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,11.922,12.586a1.065,1.065,0,0,0,.156,0c7.135-3.073,11.922-8.039,11.922-12.586A6.8,6.8,0,0,0,17.5,1.917Z"></path>
-                      </svg>
-                      {localStorage.getItem('jwtToken') && (
-                        <svg key={`celebrate-${product.id}`} className={styles.celebrate} width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                          <polygon className={styles.poly} points="10,10 20,20" ></polygon>
-                          <polygon className={styles.poly} points="10,50 20,50" ></polygon>
-                          <polygon className={styles.poly} points="20,20 30,10" ></polygon>
+        {products.map(product => {
+          const cartItem = cartItems.find(item => item.productId === product.id);
+          const quickBuyQuantity = cartItem ? cartItem.quantity : 0;
+          return (
+            <motion.div
+              key={product.id}
+              className={styles.cardContainer}
+              variants={itemVariants}
+              whileHover="hover"
+              initial="hidden"
+              animate="show"
+            >
+              <Card className={styles.card}>
+                <Box className={styles.imageWrapper}>
+                  <CardMedia
+                    key={`media-${product.id}`}
+                    component="img"
+                    image={product.imageUrl}
+                    alt={product.title || product.name}
+                    className={styles.image}
+                  />
+                  <div key={`wishlist-${product.id}`} className={styles.wishlistIcon}>
+                    <label className={styles['con-like']}>
+                      <input
+                        type="checkbox"
+                        className={styles.like}
+                        checked={product.isWishlisted || false}
+                        onChange={(e) => handleWishlistClick(product, e.target.checked)}
+                      />
+                      <div className={styles.checkmark}>
+                        <svg key={`outline-${product.id}`} viewBox="0 0 24 24" className={styles.outline} xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                          <path d="M17.5,1.917a6.476,6.476,0,0,0-5.5,3.3,6.476,6.476,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,11.922,12.586a1.065,1.065,0,0,0,.156,0c7.135-3.073,11.922-8.039,11.922-12.586A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.535L12,18.473l-1.915,2A15.138,15.138,0,0,1,2,8.967A4.87,4.87,0,0,1,6.5,4.917a4.679,4.679,0,0,1,4.5,3.334A1.065,1.065,0,0,0,12,8.607a1.065,1.065,0,0,0,.979-.356A4.679,4.679,0,0,1,17.5,4.917a4.87,4.87,0,0,1,4.5,4.05C22,14.65,17.214,19.615,13.915,20.452Z"></path>
                         </svg>
-                      )}
-                    </div>
-                  </label>
-                </div>
-                <div
-                  key={`quickbuy-${product.id}`}
-                  className={styles.quickBuyButton}
-                >
-                  {product.quickBuyQuantity && product.quickBuyQuantity > 0 ? (
-                    <Box className={styles.quantitySelector}>
-                      <Button size="small" onClick={() => handleUpdateQuantity(product, -1)}>-</Button>
-                      <Typography variant="body2">{product.quickBuyQuantity}</Typography>
-                      <Button size="small" onClick={() => handleUpdateQuantity(product, 1)}>+</Button>
-                    </Box>
-                  ) : (
-                    <Button variant="contained" onClick={() => handleAddToCart(product)}>Quick Buy</Button>
-                  )}
-                </div>
-              </Box>
-              <CardContent>
-                <Typography onClick={() => handleProductNavigation(product.id)} key={`name-${product.id}`} style={{ fontSize: '1.1rem', fontWeight: 'bold', cursor: "pointer" }}>{product.name || product.title}</Typography>
-                <Typography key={`price-${product.id}`} className={styles.price}>{formatPrice(product.price)}</Typography>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                        <svg key={`filled-${product.id}`} viewBox="0 0 24 24" className={styles.filled} xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                          <path d="M17.5,1.917a6.476,6.476,0,0,0-5.5,3.3,6.476,6.476,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,11.922,12.586a1.065,1.065,0,0,0,.156,0c7.135-3.073,11.922-8.039,11.922-12.586A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                        </svg>
+                        {localStorage.getItem('jwtToken') && (
+                          <svg key={`celebrate-${product.id}`} className={styles.celebrate} width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                            <polygon className={styles.poly} points="10,10 20,20" ></polygon>
+                            <polygon className={styles.poly} points="10,50 20,50" ></polygon>
+                            <polygon className={styles.poly} points="20,20 30,10" ></polygon>
+                          </svg>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+                  <div
+                    key={`quickbuy-${product.id}`}
+                    className={styles.quickBuyButton}
+                  >
+                    {quickBuyQuantity > 0 ? (
+                      <Box className={styles.quantitySelector}>
+                        <Button size="small" onClick={() => handleUpdateQuantity(product, -1)}>-</Button>
+                        <Typography variant="body2">{quickBuyQuantity}</Typography>
+                        <Button size="small" onClick={() => handleUpdateQuantity(product, 1)}>+</Button>
+                      </Box>
+                    ) : (
+                      <Button variant="contained" onClick={() => handleAddToCart(product)}>Quick Buy</Button>
+                    )}
+                  </div>
+                </Box>
+                <CardContent>
+                  <Typography onClick={() => handleProductNavigation(product.id)} key={`name-${product.id}`} style={{ fontSize: '1.1rem', fontWeight: 'bold', cursor: "pointer" }}>{product.name || product.title}</Typography>
+                  <Typography key={`price-${product.id}`} className={styles.price}>{formatPrice(product.price)}</Typography>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
       </motion.div>
     </Box>
   );

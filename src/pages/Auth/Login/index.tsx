@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { Box, Typography, TextField, Button, CircularProgress, Alert } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../../../services/authService';
-import styles from './login.module.scss';
 import { REGISTER_URL } from '../../../constants/routes';
 import { useUser } from '../../../context/UserContext';
+import styles from './login.module.scss';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
   const { setUser } = useUser()
 
@@ -19,7 +18,6 @@ const LoginPage: React.FC = () => {
     event.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
       const response = await loginUser(email, password);

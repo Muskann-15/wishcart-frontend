@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import styles from '../Home/home.module.scss';
 import { AppLoader } from '../../components/Loader';
+import styles from '../Home/home.module.scss';
 
 const CollectionPage: React.FC = () => {
   const [loading, setLoading] = useState(true);

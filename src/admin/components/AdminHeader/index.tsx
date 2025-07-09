@@ -1,26 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Box, Typography, Menu, MenuItem, IconButton } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import styles from './header.module.scss';
 import { LOGIN_URL, REGISTER_URL } from '../../../constants/routes';
 import { useUser } from '../../../context/UserContext';
+import styles from './header.module.scss';
 
 const AdminHeader: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user, setUser } = useUser();
   const [isScrolled, setIsScrolled] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const [showSearchBar, setShowSearchBar] = useState(false);
   const userName = user?.name || '';
   const userEmail = user?.email || '';
   const token = localStorage.getItem('jwtToken');
-
-  useEffect(() => {
-    setShowSearchBar(location.pathname === '/shop');
-  }, [location.pathname]);
 
   useEffect(() => {
     const handleScroll = () => {

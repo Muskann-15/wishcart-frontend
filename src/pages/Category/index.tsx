@@ -2,17 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material';
 import type { Product } from '../../type/product';
-import ProductSection from '../../components/ProductsSection';
-import CategoryFilter from '../../components/CategoryFilter';
-// import { AppLoader } from '../../components/Loader';
+import { CategoryFilterSkeleton, CategoryFilter, ProductCardSkeleton, ProductSection } from '../../components';
 import { getWishlist } from '../../services/wishlistService';
-import { useUser } from '../../context/UserContext';
+// import { useUser } from '../../context/UserContext';
 import { API_BASE_URL } from '../../constants/api';
 import type { FetchedProductItem } from '../../types/ProductTypes';
 import { CART_URL } from '../../constants/routes';
+import { useSelector } from 'react-redux';
+import type { ICartItem, IWishlistItem } from '../../types/UserTypes';
+import type { RootState } from '../../config/store';
 import styles from './category.module.scss';
-import ProductCardSkeleton from '../../components/ProductCardSkeleton';
-import CategoryFilterSkeleton from '../../components/CategoryFilterSkeleton';
 
 const MALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/male`;
 const FEMALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/female`;
@@ -20,7 +19,10 @@ const FEMALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/female`;
 const CategoryPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, loading, error } = useUser();
+  // const { user, loading, error } = useUser();
+  const { userData: user } = useSelector((state: RootState) => state.userState)
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const [categoryName, setCategoryName] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
@@ -42,8 +44,8 @@ const CategoryPage: React.FC = () => {
     const selectedRatings = params.get('ratings')?.split(',') || [];
 
     let currentFilteredProducts = products.map(product => {
-      const cartItem = user?.cart?.find(item => item.productId === product.id);
-      const isWishlisted = !!user?.wishlist?.find(item => item.productId === product.id);
+      const cartItem = user?.cart?.find((item: ICartItem )=> item.productId === product.id);
+      const isWishlisted = !!user?.wishlist?.find((item: IWishlistItem) => item.productId === product.id);
       return { ...product, quickBuyQuantity: cartItem ? cartItem.quantity : undefined, isWishlisted };
     });
 
@@ -241,7 +243,7 @@ const CategoryPage: React.FC = () => {
     }
   };
 
-  const handleProductWishlistToggle = (productId: string, isWishlisted: boolean, productCategory: string) => {
+  const handleProductWishlistToggle = (productId: string, isWishlisted: boolean) => {
     setWishlistProductIds(prev => {
       const newSet = new Set(prev);
       if (isWishlisted) {
@@ -275,8 +277,6 @@ const CategoryPage: React.FC = () => {
     );
   }
 
-  const cartCount = user?.cart?.reduce((acc, item) => acc + item.quantity, 0) || 0;
-
   return (
     <Container maxWidth='xl' sx={{ px: '5% !important' }} className={styles.container}>
       <Box className={styles.breadcrumbs}>
@@ -298,7 +298,7 @@ const CategoryPage: React.FC = () => {
           {localLoading ? (
             <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
               {Array.from({ length: 8 }).map((_, idx) => (
-                <Box key={idx} sx={{ width: { xs: '100%', sm: '45%', md: '48%' }, mb: 3 }}>
+                <Box key={idx} sx={{ width: { xs: '100%', sm: '45%', md: '23%' }, mb: 3 }}>
                   <ProductCardSkeleton />
                 </Box>
               ))}

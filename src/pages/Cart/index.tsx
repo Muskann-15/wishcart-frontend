@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -14,16 +15,21 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
 import { formatPrice } from '../../utils/formatters';
-import { useCart } from '../../context/CartContext';
-import { AppLoader } from '../../components/Loader';
+import { AppLoader } from '../../components';
+import { fetchCart, removeFromCart } from '../../redux/cartData/cartApi';
+import type { RootState, AppDispatch } from '../../config/store';
+import { createRazorpayOrder } from '../../services/paymentService';
 import styles from './cart.module.scss';
-import { initiateHostedCheckout } from '../../services/paymentService';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cart, loading, error, removeItemFromCart } = useCart();
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: cartItems, loading, error } = useSelector((state: RootState) => state.cart);
 
-  const cartItems = cart?.items || [];
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
+
   const totalItems = cartItems.length;
   const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -33,43 +39,58 @@ const CartPage: React.FC = () => {
 
   const handleRemoveItem = async (productId: string) => {
     try {
-      await removeItemFromCart(productId);
+      await dispatch(removeFromCart(productId));
     } catch (error) {
       console.error('Failed to remove item:', error);
     }
   };
 
-  const redirectToHostedCheckout = (url: string, params: Record<string, string>) => {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = url;
+  const handleCheckout = async () => {
+    try {
+      const res = await createRazorpayOrder(totalPrice);
+      const order = res.order;
 
-    for (const [key, value] of Object.entries(params)) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = String(value); // ensure string
-      form.appendChild(input);
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID!,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Wishcart',
+        description: 'Payment for cart items',
+        order_id: order.id,
+        handler: async function (response: any) {
+          console.log('Payment Success:', response);
+
+          const verifyRes = await fetch('/api/payment/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response),
+          });
+
+          const data = await verifyRes.json();
+          if (data.success) {
+            navigate('/payment-success');
+          } else {
+            navigate('/payment-failed');
+          }
+        },
+        prefill: {
+          name: 'Test User',
+          email: 'test@example.com',
+          contact: '9999999999',
+        },
+        theme: {
+          color: '#528FF0',
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+
+      rzp.open();
+    } catch (err) {
+      console.error('Checkout Error:', err);
     }
-
-    document.body.appendChild(form);
-    form.submit();
   };
 
-  const initializePayment = async () => {
-    console.log("res-->>>>>>")
-    try {
-      const res = await initiateHostedCheckout(totalPrice);
-      console.log("res", res)
-      if (res.success && res.url && res.params) {
-        redirectToHostedCheckout(res.url, res.params); // Redirect via POST
-      } else {
-        console.log('❌ Invalid response from server');
-      }
-    } catch (err: any) {
-      console.log('❌ Payment failed: ' + err.message);
-    }
-  }
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -169,11 +190,10 @@ const CartPage: React.FC = () => {
                   variant="contained"
                   color="primary"
                   className={styles.checkoutButton}
-                  onClick={initializePayment}
+                  onClick={handleCheckout}
                 >
                   Proceed to Checkout
                 </Button>
-
               </Box>
             </Box>
           )}

@@ -8,7 +8,7 @@ import { addProductToWishlist, removeProductFromWishlist } from '../../services/
 import { useCart } from '../../context/CartContext';
 import { useUser } from '../../context/UserContext';
 import { formatPrice } from '../../utils/formatters';
-import { AppLoader } from '../../components/Loader';
+import { AppLoader } from '../../components';
 import styles from './exclusiveBuying.module.scss';
 
 const ExclusiveBuyingPage: React.FC = () => {
@@ -23,7 +23,6 @@ const ExclusiveBuyingPage: React.FC = () => {
   const { addItemToCart, fetchCart, removeItemFromCart } = useCart();
   const { user, refreshUserDetails } = useUser();
 
-  // Compute cart quantity and wishlist state from user context
   const cartQuantity = user?.cart?.find(item => item.productId === product?.id)?.quantity || 0;
   const isWishlisted = !!user?.wishlist?.find(item => item.productId === product?.id);
 

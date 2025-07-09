@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, CircularProgress, Alert } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import { Box, Typography, TextField, Button, CircularProgress, Alert } from '@mui/material';
 import { registerUser } from '../../../services/authService';
-import styles from './register.module.scss';
 import { LOGIN_URL } from '../../../constants/routes';
+import styles from './register.module.scss';
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
