@@ -4,7 +4,6 @@ import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/mate
 import type { Product } from '../../type/product';
 import { CategoryFilterSkeleton, CategoryFilter, ProductCardSkeleton, ProductSection } from '../../components';
 import { getWishlist } from '../../services/wishlistService';
-// import { useUser } from '../../context/UserContext';
 import { API_BASE_URL } from '../../constants/api';
 import type { FetchedProductItem } from '../../types/ProductTypes';
 import { CART_URL } from '../../constants/routes';
@@ -19,7 +18,6 @@ const FEMALE_PRODUCTS_URL = `${API_BASE_URL}/category-products/female`;
 const CategoryPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // const { user, loading, error } = useUser();
   const { userData: user } = useSelector((state: RootState) => state.userState)
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -70,7 +68,7 @@ const CategoryPage: React.FC = () => {
     });
 
     if (selectedRatings.length > 0) {
-      currentFilteredProducts = currentFilteredProducts.filter(product => {
+      currentFilteredProducts = currentFilteredProducts.filter(_ => {
         const productRating = 0;
         return selectedRatings.some(selectedRating => {
           if (selectedRating === '4★ & above') return productRating >= 4;

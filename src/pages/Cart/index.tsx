@@ -20,6 +20,8 @@ import { fetchCart, removeFromCart } from '../../redux/cartData/cartApi';
 import type { RootState, AppDispatch } from '../../config/store';
 import { createRazorpayOrder } from '../../services/paymentService';
 import styles from './cart.module.scss';
+import { API_BASE_URL } from '../../constants/api';
+import { PAYMENT_FAILED_URL, PAYMENT_SUCCESS_URL } from '../../constants/routes';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,9 +60,13 @@ const CartPage: React.FC = () => {
         description: 'Payment for cart items',
         order_id: order.id,
         handler: async function (response: any) {
-          console.log('Payment Success:', response);
+          localStorage.setItem('paymentSuccess', JSON.stringify({
+            total: order.amount / 100,
+            orderId: response.razorpay_order_id,
+            paymentId: response.razorpay_payment_id,
+          }));
 
-          const verifyRes = await fetch('/api/payment/verify', {
+          const verifyRes = await fetch(`${API_BASE_URL}/payment/razorpay/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response),
@@ -68,9 +74,9 @@ const CartPage: React.FC = () => {
 
           const data = await verifyRes.json();
           if (data.success) {
-            navigate('/payment-success');
+            navigate(PAYMENT_SUCCESS_URL);
           } else {
-            navigate('/payment-failed');
+            navigate(PAYMENT_FAILED_URL);
           }
         },
         prefill: {

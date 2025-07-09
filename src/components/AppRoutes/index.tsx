@@ -20,8 +20,10 @@ import {
   RegisterPage,
   ExclusiveBuyingPage,
   CartPage,
+  PaymentSuccess,
+  PaymentFailed,
 } from "../../pages";
-import { ADMIN_DASHBOARD_URL, BLOGPAGE_URL, CAREERSPAGE_URL, CART_URL, CATEGORY_URL, COLLECTIONPAGE_URL, COMMUNITYPAGE_URL, COOKIEPAGE_URL, DOCUMENTATIONPAGE_URL, GDPRPAGE_URL, HELPPAGE_URL, HOMEPAGE_URL, LOGIN_URL, OUTLETPAGE_URL, PRESSPAGE_URL, PRODUCT_PAGE_URL, PROFILEPAGE_URL, REGISTER_URL, SEARCHPAGE_URL, TUTORIALPAGE_URL, WISHLISTPAGE_URL } from '../../constants/routes';
+import { ADMIN_DASHBOARD_URL, BLOGPAGE_URL, CAREERSPAGE_URL, CART_URL, CATEGORY_URL, COLLECTIONPAGE_URL, COMMUNITYPAGE_URL, COOKIEPAGE_URL, DOCUMENTATIONPAGE_URL, GDPRPAGE_URL, HELPPAGE_URL, HOMEPAGE_URL, LOGIN_URL, OUTLETPAGE_URL, PAYMENT_FAILED_URL, PAYMENT_SUCCESS_URL, PRESSPAGE_URL, PRODUCT_PAGE_URL, PROFILEPAGE_URL, REGISTER_URL, SEARCHPAGE_URL, TUTORIALPAGE_URL, WISHLISTPAGE_URL } from '../../constants/routes';
 import AdminDashboardPage from '../../admin/pages/Dashboard';
 import { useEffect } from 'react';
 import ProtectedRoute from '../../routes/ProtectedRoute';
@@ -69,6 +71,8 @@ export default function AppRoutes() {
           <Route path={WISHLISTPAGE_URL} element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
           <Route path={`${PRODUCT_PAGE_URL}/:id`} element={<ExclusiveBuyingPage />} />
           <Route path={CART_URL} element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+          <Route path={PAYMENT_SUCCESS_URL} element={<PaymentSuccess />} />
+          <Route path={PAYMENT_FAILED_URL} element={<PaymentFailed />} />
         </Routes>
         :
         <Routes>

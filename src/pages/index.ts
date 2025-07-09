@@ -18,6 +18,8 @@ import LoginPage from "./Auth/Login";
 import RegisterPage from "./Auth/Register";
 import ExclusiveBuyingPage from "./exclusiveBuying";
 import CartPage from "./Cart";
+import PaymentSuccess from "./Payment/paymentSuccess";
+import PaymentFailed from "./Payment/paymentFailed";
 
 export {
   HomePage,
@@ -39,5 +41,7 @@ export {
   LoginPage,
   RegisterPage,
   ExclusiveBuyingPage,
-  CartPage
+  CartPage,
+  PaymentSuccess,
+  PaymentFailed
 }
