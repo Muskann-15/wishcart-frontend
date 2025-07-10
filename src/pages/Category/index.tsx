@@ -42,8 +42,10 @@ const CategoryPage: React.FC = () => {
     const selectedRatings = params.get('ratings')?.split(',') || [];
 
     let currentFilteredProducts = products.map(product => {
-      const cartItem = user?.cart?.find((item: ICartItem )=> item.productId === product.id);
-      const isWishlisted = !!user?.wishlist?.find((item: IWishlistItem) => item.productId === product.id);
+      const cartItem = user?.cart?.find((item: ICartItem) => item.productId === product.id);
+      const isWishlisted = typeof product.isWishlisted === 'boolean'
+        ? product.isWishlisted
+        : !!user?.wishlist?.find((item: IWishlistItem) => item.productId === product.id);
       return { ...product, quickBuyQuantity: cartItem ? cartItem.quantity : undefined, isWishlisted };
     });
 

@@ -6,7 +6,6 @@ import { addProductToWishlist, removeProductFromWishlist } from '../../services/
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../config/store';
 import { addToCart, removeFromCart } from '../../redux/cartData/cartApi';
-import { useUser } from '../../context/UserContext';
 import { PRODUCT_PAGE_URL } from '../../constants/routes';
 import type { Product } from '../../type/product';
 import { formatPrice } from '../../utils/formatters';
@@ -38,11 +37,10 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
   const dispatch = useDispatch<AppDispatch>();
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const navigate = useNavigate();
-  const { refreshUserDetails } = useUser();
-
   const [cartError, setCartError] = useState<string | null>(null);
 
   const handleWishlistClick = async (product: Product, isChecked: boolean) => {
+    onWishlistToggle(product.id, isChecked, product.category || 'unknown');
     try {
       const token = localStorage.getItem('jwtToken');
       if (!token) {
@@ -54,8 +52,6 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
       } else {
         await removeProductFromWishlist(product.id, productType);
       }
-      onWishlistToggle(product.id, isChecked, product.category || 'unknown');
-      await refreshUserDetails();
     } catch (error) {
       console.error('Wishlist operation failed:', error);
     }
