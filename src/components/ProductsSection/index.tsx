@@ -48,7 +48,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
         return;
       }
       if (isChecked) {
-        await addProductToWishlist({ productId: product.id, name: product.name, productType: productType });
+        await addProductToWishlist({ productId: product.id, productType: productType });
       } else {
         await removeProductFromWishlist(product.id, productType);
       }

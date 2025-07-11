@@ -11,6 +11,7 @@ import {
   Slider
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { categories, ratings } from '../../constants/constants';
 import styles from './categoryFilter.module.scss';
 
 const CategoryFilter: React.FC = () => {
@@ -90,22 +91,6 @@ const CategoryFilter: React.FC = () => {
     const currentValues = params.get(filterType) ? params.get(filterType)!.split(',') : [];
     return currentValues.includes(value);
   }, [getSearchParams]);
-
-
-  const categories = [
-    'Jeans',
-    'Jacket',
-    'Shirts',
-    'Accessories',
-    'Dresses',
-  ];
-
-  const ratings = [
-    '4★ & above',
-    '3★ & above',
-    '2★ & above',
-    '1★ & above',
-  ];
 
   return (
     <Box className={styles.filterContainer}>

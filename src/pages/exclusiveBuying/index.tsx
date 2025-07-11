@@ -273,14 +273,7 @@ const ExclusiveBuyingPage: React.FC = () => {
           </Box>
         </Box>
         {product && product.quickBuyQuantity && product.quickBuyQuantity > 0 && (
-          <Box
-            sx={{
-              position: 'fixed',
-              bottom: 30,
-              right: 30,
-              zIndex: 1000,
-            }}
-          >
+          <Box sx={{ position: 'fixed', bottom: 30, right: 30, zIndex: 1000 }}>
             <Button
               variant="contained"
               color="primary"

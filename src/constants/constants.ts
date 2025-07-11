@@ -31,3 +31,19 @@ export const CopyrightLegalLinks = [
   { href: '/terms', text: 'Terms' },
   { href: '/cookies', text: 'Cookies' },
 ];
+
+
+export const categories = [
+  'Jeans',
+  'Jacket',
+  'Shirts',
+  'Accessories',
+  'Dresses',
+];
+
+export const ratings = [
+  '4★ & above',
+  '3★ & above',
+  '2★ & above',
+  '1★ & above',
+];

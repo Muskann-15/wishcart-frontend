@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -12,7 +11,21 @@ const PaymentSuccess: React.FC = () => {
     total: number;
     orderId: string;
     paymentId: string;
+    paidAt?: string;
   } | null>(null);
+
+  const formatDateTime = (iso: string): string => {
+    const date = new Date(iso);
+    return date.toLocaleString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+  };
 
   useEffect(() => {
     const stored = localStorage.getItem('paymentSuccess');
@@ -35,14 +48,20 @@ const PaymentSuccess: React.FC = () => {
         <Typography variant="body1" sx={{ mb: 2 }}>
           Thank you for your purchase. Your payment has been processed successfully.
         </Typography>
+
         <Box sx={{ bgcolor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 2, p: 2, mb: 3, textAlign: 'left' }}>
-          {/* <Typography variant="body2" color="text.secondary">Razorpay Payment ID:</Typography>
-          <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>{paymentDetails.paymentId}</Typography> */}
           <Typography variant="body2" color="text.secondary">Razorpay Order ID:</Typography>
           <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>{paymentDetails.orderId}</Typography>
+
           <Typography variant="body2" color="text.secondary">Amount:</Typography>
-          <Typography variant="body2" fontWeight={600}>₹{paymentDetails.total}</Typography>
+          <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>₹{paymentDetails.total}</Typography>
+
+          <Typography variant="body2" color="text.secondary">Date & Time:</Typography>
+          <Typography variant="body2" fontWeight={600}>
+            {paymentDetails.paidAt ? formatDateTime(paymentDetails.paidAt) : 'N/A'}
+          </Typography>
         </Box>
+
         <Button
           variant="contained"
           color="success"
@@ -66,4 +85,4 @@ const PaymentSuccess: React.FC = () => {
   );
 };
 
-export default PaymentSuccess; 
+export default PaymentSuccess;

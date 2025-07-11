@@ -85,8 +85,8 @@ const Header: React.FC = () => {
           Men
         </Link>
         <Link
-          to="/shop"
-          className={`${styles.navLink} ${location.pathname === '/shop' && !location.search.includes('category=') ? styles.activeLink : ''}`}
+          to="/shop?category=all"
+          className={`${styles.navLink} ${location.search.includes('category=all')  ? styles.activeLink : ''}`}
         >
           Collection
         </Link>

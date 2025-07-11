@@ -6,7 +6,6 @@ interface InitialStateType {
     userData: IUser,
     loading: boolean,
     error: string, 
-    // refreshUserDetails: fetchUserDetails
   }
 
 const initialState: InitialStateType = {

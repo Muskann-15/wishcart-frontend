@@ -14,14 +14,14 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
-import { formatPrice } from '../../utils/formatters';
 import { AppLoader } from '../../components';
+import { formatPrice } from '../../utils/formatters';
 import { fetchCart, removeFromCart } from '../../redux/cartData/cartApi';
 import type { RootState, AppDispatch } from '../../config/store';
 import { createRazorpayOrder } from '../../services/paymentService';
-import styles from './cart.module.scss';
-import { API_BASE_URL } from '../../constants/api';
 import { PAYMENT_FAILED_URL, PAYMENT_SUCCESS_URL } from '../../constants/routes';
+import { API_BASE_URL } from '../../constants/api';
+import styles from './cart.module.scss';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +64,7 @@ const CartPage: React.FC = () => {
             total: order.amount / 100,
             orderId: response.razorpay_order_id,
             paymentId: response.razorpay_payment_id,
+            paidAt: new Date().toISOString()
           }));
 
           const verifyRes = await fetch(`${API_BASE_URL}/payment/razorpay/verify`, {
@@ -76,7 +77,9 @@ const CartPage: React.FC = () => {
           if (data.success) {
             navigate(PAYMENT_SUCCESS_URL);
           } else {
-            navigate(PAYMENT_FAILED_URL);
+            navigate(
+              `${PAYMENT_FAILED_URL}?amount=${order.amount}&date=${encodeURIComponent(new Date().toISOString())}`
+            );
           }
         },
         prefill: {
@@ -96,7 +99,6 @@ const CartPage: React.FC = () => {
       console.error('Checkout Error:', err);
     }
   };
-
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },

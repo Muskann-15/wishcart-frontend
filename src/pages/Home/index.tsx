@@ -190,8 +190,8 @@ const HomePage: React.FC = () => {
               products designed for your lifestyle.
             </Typography>
             <Box className={styles.bannerButtons} sx={{ marginTop: '5%' }}>
-              <CustomButton variant="contained" onClick={() => navigate('/shop')}>Shop Now</CustomButton>
-              <CustomButton variant="outlined" onClick={() => navigate('/shop')}>View Collections</CustomButton>
+              <CustomButton variant="contained" onClick={() => navigate('/shop?category=all')}>Shop Now</CustomButton>
+              <CustomButton variant="outlined" onClick={() => navigate('/shop?category=all')}>View Collections</CustomButton>
             </Box>
             <Box sx={{
               display: 'flex',

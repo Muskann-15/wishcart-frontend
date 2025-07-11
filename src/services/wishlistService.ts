@@ -2,7 +2,7 @@ import { API_BASE_URL } from "../constants/api";
 
 interface WishlistProduct {
   productId: string;
-  name: string;
+  name?: string;
   productType: string;
 }
 
