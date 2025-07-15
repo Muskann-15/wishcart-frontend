@@ -23,8 +23,8 @@ export const fetchFilteredCategoryProducts = createAsyncThunk<
   'categoryProducts/fetchFiltered',
   async ({ gender, params }, thunkAPI) => {
     try {
-      const searchParams = new URLSearchParams(params).toString();
-      const res = await Axios.get<ApiResponse>(`/category-products/${gender}?${searchParams}`);
+      const searchParams = new URLSearchParams(params).toString().toLowerCase();
+      const res = await Axios.get<ApiResponse>(`/category-products?gender=${gender}&${searchParams}`);
       const { clothing = [], accessories = [] } = res.data.data || {};
       const mapProduct = (item: any) => ({
         ...item,

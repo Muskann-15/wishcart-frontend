@@ -32,11 +32,10 @@ export const CopyrightLegalLinks = [
   { href: '/cookies', text: 'Cookies' },
 ];
 
-
 export const categories = [
   'Jeans',
   'Jacket',
-  'Shirts',
+  'Shirt',
   'Accessories',
   'Dresses',
 ];

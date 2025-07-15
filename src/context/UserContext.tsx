@@ -62,8 +62,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    fetchUserDetails();
-  }, [fetchUserDetails]);
+    const isUserLoggedIn = localStorage.getItem("jwtToken");
+    if (isUserLoggedIn) {
+      fetchUserDetails();
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser, loading, error, refreshUserDetails: fetchUserDetails }}>

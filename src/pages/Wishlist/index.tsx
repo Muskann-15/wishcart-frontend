@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Box, Typography, Container, Alert } from '@mui/material';
 import { removeProductFromWishlist } from '../../services/wishlistService';
 import { AppLoader, ProductSection } from '../../components';
 import type { Product } from '../../type/product';
 import { useUser } from '../../context/UserContext';
-import { useDispatch } from 'react-redux';
 import { updateLoadingValue } from '../../redux/userData/userSlice';
 import styles from './wishlist.module.scss';
 

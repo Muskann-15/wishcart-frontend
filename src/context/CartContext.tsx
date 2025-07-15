@@ -142,7 +142,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchCart();
+    const isUserLoggedIn = localStorage.getItem("jwtToken");
+    if (isUserLoggedIn) {
+      fetchCart();
+    }
   }, []);
 
   return (

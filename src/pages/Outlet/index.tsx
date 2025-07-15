@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography, Container } from '@mui/material';
-import styles from '../Home/home.module.scss';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../config/store';
+import styles from '../Home/home.module.scss';
 
 const OutletPage: React.FC = () => {
   const user = useSelector((state: RootState) => state.userState)

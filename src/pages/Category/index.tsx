@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { useLocation, Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material';
 import { CategoryFilterSkeleton, CategoryFilter, ProductCardSkeleton, ProductSection } from '../../components';
 import { CART_URL } from '../../constants/routes';
-import styles from './category.module.scss';
-import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../../config/store';
+import type { RootState, AppDispatch } from '../../config/store';
 import { fetchFilteredCategoryProducts } from '../../redux/searchFilterData/searchFilterApi';
-import type { AppDispatch } from '../../config/store';
+import styles from './category.module.scss';
 
 const CategoryPage: React.FC = () => {
   const location = useLocation();
