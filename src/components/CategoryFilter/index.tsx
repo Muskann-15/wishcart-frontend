@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -6,20 +6,19 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Checkbox,
-  FormControlLabel,
   Slider
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { categories, ratings } from '../../constants/constants';
 import styles from './categoryFilter.module.scss';
+import TextAccordion from './TextAccordion';
+import type { ExpandedAccordionsType } from '../../type/product';
 
 const CategoryFilter: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const getSearchParams = useCallback(() => new URLSearchParams(location.search), [location.search]);
-
   const getPriceRangeFromUrl = useCallback(() => {
     const params = getSearchParams();
     const minPrice = parseInt(params.get('minPrice') || '0', 10);
@@ -28,26 +27,11 @@ const CategoryFilter: React.FC = () => {
   }, [getSearchParams]);
 
   const [localPriceRange, setLocalPriceRange] = useState<number[]>(getPriceRangeFromUrl());
-  const [expandedAccordions, setExpandedAccordions] = useState<Record<string, boolean>>({
+  const [expandedAccordions, setExpandedAccordions] = useState<ExpandedAccordionsType>({
     categories: false,
     priceRange: false,
     ratings: false,
   });
-
-  useEffect(() => {
-    setAccordionProperties();
-  }, [location.search, getPriceRangeFromUrl, getSearchParams]);
-
-  const setAccordionProperties = () => {
-    setLocalPriceRange(getPriceRangeFromUrl());
-
-    const params = getSearchParams();
-    setExpandedAccordions({
-      categories: params.has('categories'),
-      priceRange: params.has('minPrice') || params.has('maxPrice'),
-      ratings: params.has('ratings'),
-    });
-  }
 
   const handleAccordionChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpandedAccordions((prev) => ({
@@ -63,6 +47,7 @@ const CategoryFilter: React.FC = () => {
     const params = getSearchParams();
     params.set('minPrice', newRange[0].toString());
     params.set('maxPrice', newRange[1].toString());
+    params.delete('search');
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
@@ -83,8 +68,10 @@ const CategoryFilter: React.FC = () => {
     } else {
       params.delete(filterType);
     }
+    params.delete('search');
     navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
+  console.log("expandedAccordions", expandedAccordions)
 
   const isChecked = useCallback((filterType: string, value: string) => {
     const params = getSearchParams();
@@ -97,28 +84,15 @@ const CategoryFilter: React.FC = () => {
       <Typography variant="h6" className={styles.filterTitle}>
         Filters
       </Typography>
-
-      <Accordion expanded={expandedAccordions.categories} onChange={handleAccordionChange('categories')} className={styles.filterAccordion}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Categories</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {categories.map((category) => (
-            <FormControlLabel
-              key={category}
-              control={
-                <Checkbox
-                  checked={isChecked('categories', category)}
-                  onChange={(e) => handleCheckboxChange('categories', category, e.target.checked)}
-                />
-              }
-              label={category}
-              className={styles.filterCheckbox}
-            />
-          ))}
-        </AccordionDetails>
-      </Accordion>
-
+      <TextAccordion
+        expandedAccordions={expandedAccordions}
+        isChecked={isChecked}
+        handleAccordionChange={handleAccordionChange}
+        handleCheckboxChange={handleCheckboxChange}
+        filterType="categories"
+        data={categories}
+        title="Categories"
+      />
       <Accordion expanded={expandedAccordions.priceRange} onChange={handleAccordionChange('priceRange')} className={styles.filterAccordion}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Price Range</Typography>
@@ -139,29 +113,17 @@ const CategoryFilter: React.FC = () => {
           </Box>
         </AccordionDetails>
       </Accordion>
-
-      <Accordion expanded={expandedAccordions.ratings} onChange={handleAccordionChange('ratings')} className={styles.filterAccordion}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Ratings</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {ratings.map((rating) => (
-            <FormControlLabel
-              key={rating}
-              control={
-                <Checkbox
-                  checked={isChecked('ratings', rating)}
-                  onChange={(e) => handleCheckboxChange('ratings', rating, e.target.checked)}
-                />
-              }
-              label={rating}
-              className={styles.filterCheckbox}
-            />
-          ))}
-        </AccordionDetails>
-      </Accordion>
+      <TextAccordion
+        expandedAccordions={expandedAccordions}
+        isChecked={isChecked}
+        handleAccordionChange={handleAccordionChange}
+        handleCheckboxChange={handleCheckboxChange}
+        filterType="ratings"
+        data={ratings}
+        title="Ratings"
+      />
     </Box>
   );
 };
 
-export default CategoryFilter; 
+export default memo(CategoryFilter); 

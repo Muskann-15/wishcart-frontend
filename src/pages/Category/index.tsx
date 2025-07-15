@@ -2,10 +2,12 @@ import React, { useEffect } from 'react';
 import { useLocation, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material';
-import { CategoryFilterSkeleton, CategoryFilter, ProductCardSkeleton, ProductSection } from '../../components';
+import TablePagination from '@mui/material/TablePagination';
+import { CategoryFilter, ProductCardSkeleton, ProductSection } from '../../components';
 import { CART_URL } from '../../constants/routes';
 import type { RootState, AppDispatch } from '../../config/store';
 import { fetchFilteredCategoryProducts } from '../../redux/searchFilterData/searchFilterApi';
+import { selectCategoryTotalCount } from '../../redux/searchFilterData/searchFilterSlice';
 import styles from './category.module.scss';
 
 const CategoryPage: React.FC = () => {
@@ -25,10 +27,29 @@ const CategoryPage: React.FC = () => {
     : category === 'men' ? "male"
       : "all";
 
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const totalCount = useSelector(selectCategoryTotalCount);
+
+  useEffect(() => {
+    setPage(0);
+    const params = Object.fromEntries(new URLSearchParams(location.search).entries());
+    dispatch(fetchFilteredCategoryProducts({ gender: categoryType, params, page: 1, limit: rowsPerPage }));
+  }, [location.search, dispatch, rowsPerPage]);
+
   useEffect(() => {
     const params = Object.fromEntries(new URLSearchParams(location.search).entries());
-    dispatch(fetchFilteredCategoryProducts({ gender: categoryType, params }));
-  }, [location.search, dispatch]);
+    dispatch(fetchFilteredCategoryProducts({ gender: categoryType, params, page: page + 1, limit: rowsPerPage }));
+  }, [page, rowsPerPage, location.search, dispatch]);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleViewCartSummary = () => navigate(CART_URL);
 
@@ -47,7 +68,27 @@ const CategoryPage: React.FC = () => {
     <Container maxWidth='xl' sx={{ px: '5% !important' }} className={styles.container}>
       <Box className={styles.breadcrumbs}>
         <Breadcrumbs aria-label='breadcrumb'>
-          <Link component={RouterLink} to='/' color='inherit'>Home</Link>
+          <Link
+            component={RouterLink}
+            to="/"
+            color="inherit"
+            underline="none"
+            sx={{
+              color: 'black',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'black',
+              },
+              '&:focus': {
+                color: 'black',
+              },
+              '&:active': {
+                color: 'black',
+              }
+            }}
+          >
+            Home
+          </Link>
           <Typography color='text.primary'>{categoryName}</Typography>
         </Breadcrumbs>
       </Box>
@@ -58,7 +99,8 @@ const CategoryPage: React.FC = () => {
 
       <Box sx={{ display: 'flex', gap: 3 }}>
         <Box sx={{ width: { xs: '100%', md: '25%' } }}>
-          {loading ? <CategoryFilterSkeleton /> : <CategoryFilter />}
+          {/* {loading ? <CategoryFilterSkeleton /> : <CategoryFilter />} */}
+          <CategoryFilter />
         </Box>
         <Box sx={{ width: { xs: '100%', md: '75%' } }}>
           {loading ? (
@@ -72,12 +114,23 @@ const CategoryPage: React.FC = () => {
           ) : error ? (
             <Typography color="error" variant='body1'>Error: {error}</Typography>
           ) : products.length > 0 ? (
-            <ProductSection
-              products={productsWithWishlist}
-              productType="CategoryPageProduct"
-              onWishlistToggle={() => { }}
-              onUpdateQuickBuyQuantity={() => { }}
-            />
+            <>
+              <ProductSection
+                products={productsWithWishlist}
+                productType="CategoryPageProduct"
+                onWishlistToggle={() => { }}
+                onUpdateQuickBuyQuantity={() => { }}
+              />
+              <TablePagination
+                component="div"
+                count={totalCount}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[10, 20, 50]}
+              />
+            </>
           ) : (
             <Typography variant='body1' className={styles.noProducts}>
               No products found for this category.

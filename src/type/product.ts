@@ -17,3 +17,9 @@ export type ApiResponse<T> = {
   success: boolean;
   data: T;
 };
+
+export interface ExpandedAccordionsType {
+  categories: boolean,
+  priceRange: boolean,
+  ratings: boolean,
+}
