@@ -9,6 +9,7 @@ import { addToCart, removeFromCart } from '../../redux/cartData/cartApi';
 import { PRODUCT_PAGE_URL } from '../../constants/routes';
 import type { Product } from '../../type/product';
 import { formatPrice } from '../../utils/formatters';
+import NoImage from '../../assets/images/no-images.png';
 import styles from './productsSection.module.scss';
 
 interface ProductsSectionProps {
@@ -114,7 +115,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
                   <CardMedia
                     key={`media-${product.id}`}
                     component="img"
-                    image={product.imageUrl}
+                    image={product.imageUrl !== "emptyUrlImg" ? product.imageUrl : NoImage}
                     alt={product.title || product.name}
                     className={styles.image}
                   />

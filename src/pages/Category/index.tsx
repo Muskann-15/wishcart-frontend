@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { useLocation, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
-import { CategoryFilter, ProductCardSkeleton, ProductSection } from '../../components';
+import { CategoryFilter, ProductCardSkeleton } from '../../components';
+const ProductSection = lazy(() => import('../../components/ProductsSection'));
 import { CART_URL } from '../../constants/routes';
 import type { RootState, AppDispatch } from '../../config/store';
 import { fetchFilteredCategoryProducts } from '../../redux/searchFilterData/searchFilterApi';
@@ -30,6 +32,16 @@ const CategoryPage: React.FC = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const totalCount = useSelector(selectCategoryTotalCount);
+
+  const prevCategoryRef = React.useRef(category);
+
+  useEffect(() => {
+    if (prevCategoryRef.current !== category) {
+      setPage(0);
+      setRowsPerPage(10);
+      prevCategoryRef.current = category;
+    }
+  }, [category]);
 
   useEffect(() => {
     setPage(0);
@@ -63,6 +75,9 @@ const CategoryPage: React.FC = () => {
     ...product,
     isWishlisted: wishlistSet.has(product.id),
   }));
+
+  // Debug log for pagination
+  console.log('Pagination debug:', { page, rowsPerPage, totalCount, productsLength: products.length });
 
   return (
     <Container maxWidth='xl' sx={{ px: '5% !important' }} className={styles.container}>
@@ -102,8 +117,9 @@ const CategoryPage: React.FC = () => {
           {/* {loading ? <CategoryFilterSkeleton /> : <CategoryFilter />} */}
           <CategoryFilter />
         </Box>
-        <Box sx={{ width: { xs: '100%', md: '75%' } }}>
-          {loading ? (
+        <Suspense fallback={
+          <Box sx={{ width: { xs: '100%', md: '75%' } }}>
+
             <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
               {Array.from({ length: 8 }).map((_, idx) => (
                 <Box key={idx} sx={{ width: { xs: '100%', sm: '45%', md: '23%' }, mb: 3 }}>
@@ -111,32 +127,46 @@ const CategoryPage: React.FC = () => {
                 </Box>
               ))}
             </Box>
-          ) : error ? (
-            <Typography color="error" variant='body1'>Error: {error}</Typography>
-          ) : products.length > 0 ? (
-            <>
-              <ProductSection
-                products={productsWithWishlist}
-                productType="CategoryPageProduct"
-                onWishlistToggle={() => { }}
-                onUpdateQuickBuyQuantity={() => { }}
-              />
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                rowsPerPageOptions={[10, 20, 50]}
-              />
-            </>
-          ) : (
-            <Typography variant='body1' className={styles.noProducts}>
-              No products found for this category.
-            </Typography>
-          )}
-        </Box>
+          </Box>
+        }>
+          <Box sx={{ width: { xs: '100%', md: '75%' } }}>
+            {
+              loading ? (
+                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                  {Array.from({ length: 8 }).map((_, idx) => (
+                    <Box key={idx} sx={{ width: { xs: '100%', sm: '45%', md: '23%' }, mb: 3 }}>
+                      <ProductCardSkeleton />
+                    </Box>
+                  ))}
+                </Box>
+              ) : error ? (
+                <Typography color="error" variant='body1'>Error: {error}</Typography>
+              ) :
+                products.length > 0 ? (
+                  <>
+                    <ProductSection
+                      products={productsWithWishlist}
+                      productType="CategoryPageProduct"
+                      onWishlistToggle={() => { }}
+                      onUpdateQuickBuyQuantity={() => { }}
+                    />
+                    <TablePagination style={{ justifyItems: 'center' }}
+                      component="div"
+                      count={totalCount}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                      rowsPerPageOptions={[5, 10, 20, 50]}
+                    />
+                  </>
+                ) : (
+                  <Typography variant='body1' className={styles.noProducts}>
+                    No products found for this category.
+                  </Typography>
+                )}
+          </Box>
+        </Suspense>
       </Box>
 
       {cartCount > 0 && (
