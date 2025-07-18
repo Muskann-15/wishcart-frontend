@@ -1,22 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { lazy, Suspense } from 'react';
 import { useLocation, Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Container, Breadcrumbs, Link, Button } from '@mui/material';
-import TablePagination from '@mui/material/TablePagination';
 import { CategoryFilter, ProductCardSkeleton } from '../../components';
 const ProductSection = lazy(() => import('../../components/ProductsSection'));
 import { CART_URL } from '../../constants/routes';
 import type { RootState, AppDispatch } from '../../config/store';
 import { fetchFilteredCategoryProducts } from '../../redux/searchFilterData/searchFilterApi';
-import { selectCategoryTotalCount } from '../../redux/searchFilterData/searchFilterSlice';
 import styles from './category.module.scss';
 
 const CategoryPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
+  console.log("location", location)
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const { products, loading, error } = useSelector((state: RootState) => state.categoryProducts);
   const { userData: user } = useSelector((state: RootState) => state.userState);
@@ -25,59 +23,27 @@ const CategoryPage: React.FC = () => {
 
   const category = new URLSearchParams(location.search).get('category') || 'men';
 
-  const categoryType = category === 'women' ? "female"
-    : category === 'men' ? "male"
-      : "all";
+  const categoryType = category === 'women' ? "female" : category === 'men' ? "male" : "all";
 
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const totalCount = useSelector(selectCategoryTotalCount);
-
-  const prevCategoryRef = React.useRef(category);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    if (prevCategoryRef.current !== category) {
-      setPage(0);
-      setRowsPerPage(10);
-      prevCategoryRef.current = category;
-    }
-  }, [category]);
-
-  useEffect(() => {
-    setPage(0);
+    console.log("useEff1", categoryType, page, rowsPerPage);
     const params = Object.fromEntries(new URLSearchParams(location.search).entries());
-    dispatch(fetchFilteredCategoryProducts({ gender: categoryType, params, page: 1, limit: rowsPerPage }));
-  }, [location.search, dispatch, rowsPerPage]);
-
-  useEffect(() => {
-    const params = Object.fromEntries(new URLSearchParams(location.search).entries());
-    dispatch(fetchFilteredCategoryProducts({ gender: categoryType, params, page: page + 1, limit: rowsPerPage }));
-  }, [page, rowsPerPage, location.search, dispatch]);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    dispatch(fetchFilteredCategoryProducts({ gender: categoryType, params, page, limit: rowsPerPage }));
+  }, [location.search, dispatch, page, rowsPerPage]);
 
   const handleViewCartSummary = () => navigate(CART_URL);
 
-  const categoryName =
-    category === 'women' ? "Women's Collection"
-      : category === 'men' ? "Men's Collection"
-        : 'All Collections';
+  const categoryName =  category === 'women' ? "Women's Collection" : category === 'men' ? "Men's Collection" : 'All Collections';
 
   const wishlistSet = new Set((user?.wishlist || []).map(item => item.productId));
   const productsWithWishlist = products.map(product => ({
     ...product,
     isWishlisted: wishlistSet.has(product.id),
   }));
-
-  // Debug log for pagination
-  console.log('Pagination debug:', { page, rowsPerPage, totalCount, productsLength: products.length });
+  console.log('productsWithWishlist', productsWithWishlist)
 
   return (
     <Container maxWidth='xl' sx={{ px: '5% !important' }} className={styles.container}>
@@ -149,15 +115,11 @@ const CategoryPage: React.FC = () => {
                       productType="CategoryPageProduct"
                       onWishlistToggle={() => { }}
                       onUpdateQuickBuyQuantity={() => { }}
-                    />
-                    <TablePagination style={{ justifyItems: 'center' }}
-                      component="div"
-                      count={totalCount}
                       page={page}
-                      onPageChange={handleChangePage}
+                      setPage={setPage}
+                      setRowsPerPage={setRowsPerPage}
                       rowsPerPage={rowsPerPage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      rowsPerPageOptions={[5, 10, 20, 50]}
+                      category={category}
                     />
                   </>
                 ) : (

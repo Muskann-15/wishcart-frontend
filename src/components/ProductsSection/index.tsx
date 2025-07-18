@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Card, CardContent, CardMedia, Button, Alert } from '@mui/material';
+import { Box, Typography, Card, CardContent, CardMedia, Button, Alert, TablePagination } from '@mui/material';
 import { motion } from 'framer-motion';
 import { addProductToWishlist, removeProductFromWishlist } from '../../services/wishlistService';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import { PRODUCT_PAGE_URL } from '../../constants/routes';
 import type { Product } from '../../type/product';
 import { formatPrice } from '../../utils/formatters';
 import NoImage from '../../assets/images/no-images.png';
+import { selectCategoryTotalCount } from '../../redux/searchFilterData/searchFilterSlice';
 import styles from './productsSection.module.scss';
 
 interface ProductsSectionProps {
@@ -17,6 +18,11 @@ interface ProductsSectionProps {
   onWishlistToggle: (productId: string, isWishlisted: boolean, productCategory: string) => void;
   productType: string;
   onUpdateQuickBuyQuantity: (product: Product, change: number) => void;
+  setPage: React.Dispatch<React.SetStateAction<number>>,
+  page: number,
+  rowsPerPage: number,
+  setRowsPerPage: React.Dispatch<React.SetStateAction<number>>,
+  category?: string
 }
 
 const containerVariants = {
@@ -34,11 +40,13 @@ const itemVariants = {
   show: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } },
 };
 
-const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistToggle, productType }) => {
+const ProductsSection: React.FC<ProductsSectionProps> = ({ category, rowsPerPage, setRowsPerPage, setPage, page, products, onWishlistToggle, productType }) => {
   const dispatch = useDispatch<AppDispatch>();
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const navigate = useNavigate();
   const [cartError, setCartError] = useState<string | null>(null);
+
+  const totalCount = useSelector(selectCategoryTotalCount);
 
   const handleWishlistClick = async (product: Product, isChecked: boolean) => {
     onWishlistToggle(product.id, isChecked, product.category || 'unknown');
@@ -86,8 +94,18 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
   };
 
   const handleProductNavigation = (productId: string) => {
-    navigate(`${PRODUCT_PAGE_URL}/${productId}`)
+    navigate(`${PRODUCT_PAGE_URL}/${productId}`);
   }
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(1);
+    console.log("next", newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1);
+  };
 
   return (
     <Box className={styles.section}>
@@ -168,6 +186,16 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({ products, onWishlistT
           );
         })}
       </motion.div>
+      {category !== "shopAll" &&
+        <TablePagination style={{ justifyItems: 'center' }}
+          component="div"
+          count={totalCount}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 20, 50]}
+        />}
     </Box>
   );
 };

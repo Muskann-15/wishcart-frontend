@@ -4,13 +4,13 @@ import styles from './categoryFilter.module.scss';
 import type { ExpandedAccordionsType } from '../../type/product';
 
 interface TextAccordionProps {
-  handleCheckboxChange : (filterType: keyof ExpandedAccordionsType, value: string, checked: boolean ) => void;
+  handleCheckboxChange: (filterType: keyof ExpandedAccordionsType, value: string, checked: boolean) => void;
   expandedAccordions: ExpandedAccordionsType;
-  handleAccordionChange : (panel: keyof ExpandedAccordionsType) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
-  isChecked : (filterType: keyof ExpandedAccordionsType, value: string) => boolean;
-  data : string[];
-  title : string;
-  filterType : keyof ExpandedAccordionsType;
+  handleAccordionChange: (panel: keyof ExpandedAccordionsType) => (event: React.SyntheticEvent, isExpanded: boolean) => void;
+  isChecked: (filterType: keyof ExpandedAccordionsType, value: string) => boolean;
+  data: string[];
+  title: string;
+  filterType: keyof ExpandedAccordionsType;
 }
 
 const TextAccordion: React.FC<TextAccordionProps> = ({
@@ -22,7 +22,6 @@ const TextAccordion: React.FC<TextAccordionProps> = ({
   title,
   filterType
 }) => {
-  console.log("Accordion")
   return (
     <Accordion expanded={expandedAccordions[filterType]} onChange={handleAccordionChange(filterType)} className={styles.filterAccordion}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>

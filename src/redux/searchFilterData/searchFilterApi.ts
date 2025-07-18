@@ -34,6 +34,8 @@ export const fetchFilteredCategoryProducts = createAsyncThunk<
         totalCount = res.data.data.totalCount || 0;
       } else {
         const { clothing = [], accessories = [] } = res.data.data || {};
+        console.log('res.data.data',Object.values(res.data.data).flat());
+
         products = [...clothing, ...accessories];
         totalCount = res.data.data?.totalCount || products.length;
       }

@@ -96,6 +96,12 @@ const Header: React.FC = () => {
         >
           Outlet
         </Link>
+        <Link
+          to="/shop?category=shopAll"
+          className={`${styles.navLink} ${location.search.includes('category=shopAll')  ? styles.activeLink : ''}`}
+        >
+          Shop All
+        </Link>
       </Box>
 
       {showSearchBar && (
